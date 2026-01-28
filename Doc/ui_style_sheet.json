@@ -1,0 +1,668 @@
+{
+  "designSystem": {
+    "name": "MatDash Design System",
+    "version": "1.0.0",
+    "description": "Modern dashboard design system with clean aesthetics, vibrant colors, and comprehensive data visualization",
+    "framework": "React + Tailwind CSS",
+    
+    "colorPalette": {
+      "primary": {
+        "main": "#6366F1",
+        "light": "#818CF8",
+        "dark": "#4F46E5",
+        "description": "Vibrant indigo/purple used for primary actions, navigation highlights, and key UI elements"
+      },
+      "secondary": {
+        "pink": "#EC4899",
+        "cyan": "#06B6D4",
+        "teal": "#14B8A6",
+        "green": "#10B981",
+        "yellow": "#F59E0B",
+        "description": "Accent colors used for data visualization, status indicators, and category differentiation"
+      },
+      "background": {
+        "primary": "#F8F9FB",
+        "secondary": "#FFFFFF",
+        "tertiary": "#F3F4F6",
+        "description": "Light, clean backgrounds creating depth through subtle layering"
+      },
+      "text": {
+        "primary": "#1F2937",
+        "secondary": "#6B7280",
+        "tertiary": "#9CA3AF",
+        "description": "Dark grays for excellent readability with hierarchical contrast"
+      },
+      "status": {
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "error": "#EF4444",
+        "info": "#3B82F6"
+      }
+    },
+    
+    "typography": {
+      "fontFamily": {
+        "primary": "Inter, system-ui, -apple-system, sans-serif",
+        "fallback": "Arial, sans-serif"
+      },
+      "fontSizes": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem",
+        "4xl": "2.25rem"
+      },
+      "fontWeights": {
+        "normal": "400",
+        "medium": "500",
+        "semibold": "600",
+        "bold": "700"
+      },
+      "lineHeights": {
+        "tight": "1.25",
+        "normal": "1.5",
+        "relaxed": "1.75"
+      }
+    },
+    
+    "spacing": {
+      "unit": "4px",
+      "scale": {
+        "xs": "4px",
+        "sm": "8px",
+        "md": "12px",
+        "lg": "16px",
+        "xl": "24px",
+        "2xl": "32px",
+        "3xl": "48px",
+        "4xl": "64px"
+      }
+    },
+    
+    "borderRadius": {
+      "sm": "0.375rem",
+      "md": "0.5rem",
+      "lg": "0.75rem",
+      "xl": "1rem",
+      "2xl": "1.5rem",
+      "full": "9999px"
+    },
+    
+    "shadows": {
+      "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+      "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+      "xl": "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
+    },
+    
+    "components": {
+      "navigation": {
+        "topBar": {
+          "height": "64px",
+          "backgroundColor": "#FFFFFF",
+          "borderBottom": "1px solid #E5E7EB",
+          "padding": "0 24px",
+          "elements": {
+            "logo": {
+              "fontSize": "1.5rem",
+              "fontWeight": "700",
+              "color": "#6366F1",
+              "display": "flex",
+              "alignItems": "center",
+              "gap": "8px"
+            },
+            "menuItems": {
+              "fontSize": "0.875rem",
+              "fontWeight": "500",
+              "color": "#6B7280",
+              "padding": "8px 16px",
+              "borderRadius": "0.5rem",
+              "hoverBackgroundColor": "#F3F4F6",
+              "activeBackgroundColor": "#6366F1",
+              "activeColor": "#FFFFFF"
+            },
+            "rightSection": {
+              "display": "flex",
+              "alignItems": "center",
+              "gap": "16px",
+              "elements": ["darkModeToggle", "notifications", "languageSelector", "userProfile"]
+            }
+          }
+        }
+      },
+      
+      "cards": {
+        "standard": {
+          "backgroundColor": "#FFFFFF",
+          "borderRadius": "0.75rem",
+          "padding": "24px",
+          "boxShadow": "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+          "border": "none"
+        },
+        "welcome": {
+          "backgroundColor": "#6366F1",
+          "background": "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
+          "borderRadius": "1rem",
+          "padding": "32px",
+          "color": "#FFFFFF",
+          "elements": {
+            "title": {
+              "fontSize": "1.5rem",
+              "fontWeight": "600",
+              "marginBottom": "16px"
+            },
+            "metrics": {
+              "display": "flex",
+              "gap": "32px",
+              "fontSize": "2rem",
+              "fontWeight": "700"
+            },
+            "illustration": {
+              "position": "absolute",
+              "right": "32px",
+              "width": "120px",
+              "height": "120px"
+            }
+          }
+        },
+        "metric": {
+          "backgroundColor": "#FFFFFF",
+          "borderRadius": "0.75rem",
+          "padding": "20px",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "elements": {
+            "label": {
+              "fontSize": "0.875rem",
+              "color": "#6B7280",
+              "fontWeight": "500"
+            },
+            "value": {
+              "fontSize": "2rem",
+              "fontWeight": "700",
+              "color": "#1F2937"
+            },
+            "change": {
+              "fontSize": "0.875rem",
+              "fontWeight": "600",
+              "display": "flex",
+              "alignItems": "center",
+              "gap": "4px"
+            }
+          }
+        }
+      },
+      
+      "buttons": {
+        "primary": {
+          "backgroundColor": "#6366F1",
+          "color": "#FFFFFF",
+          "padding": "10px 20px",
+          "borderRadius": "0.5rem",
+          "fontSize": "0.875rem",
+          "fontWeight": "600",
+          "border": "none",
+          "cursor": "pointer",
+          "transition": "all 0.2s",
+          "hoverBackgroundColor": "#4F46E5"
+        },
+        "secondary": {
+          "backgroundColor": "#F3F4F6",
+          "color": "#1F2937",
+          "padding": "10px 20px",
+          "borderRadius": "0.5rem",
+          "fontSize": "0.875rem",
+          "fontWeight": "600",
+          "border": "none",
+          "cursor": "pointer",
+          "hoverBackgroundColor": "#E5E7EB"
+        },
+        "icon": {
+          "width": "36px",
+          "height": "36px",
+          "borderRadius": "0.5rem",
+          "display": "flex",
+          "alignItems": "center",
+          "justifyContent": "center",
+          "backgroundColor": "transparent",
+          "hoverBackgroundColor": "#F3F4F6"
+        }
+      },
+      
+      "charts": {
+        "lineChart": {
+          "strokeWidth": "2px",
+          "smooth": true,
+          "colors": ["#6366F1", "#EC4899", "#14B8A6"],
+          "grid": {
+            "strokeDasharray": "3 3",
+            "color": "#E5E7EB"
+          },
+          "axis": {
+            "fontSize": "0.75rem",
+            "color": "#9CA3AF"
+          }
+        },
+        "columnChart": {
+          "barWidth": "40px",
+          "colors": ["#EC4899", "#6366F1", "#14B8A6"],
+          "borderRadius": "4px 4px 0 0",
+          "spacing": "12px"
+        },
+        "donutChart": {
+          "strokeWidth": "20px",
+          "colors": ["#6366F1", "#EC4899", "#14B8A6", "#F59E0B"],
+          "centerLabel": {
+            "fontSize": "2rem",
+            "fontWeight": "700"
+          }
+        }
+      },
+      
+      "kanban": {
+        "board": {
+          "display": "flex",
+          "gap": "16px",
+          "padding": "24px",
+          "overflowX": "auto"
+        },
+        "column": {
+          "minWidth": "300px",
+          "backgroundColor": "#F8F9FB",
+          "borderRadius": "0.75rem",
+          "padding": "16px",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "12px",
+          "header": {
+            "display": "flex",
+            "alignItems": "center",
+            "justifyContent": "space-between",
+            "marginBottom": "12px",
+            "title": {
+              "fontSize": "0.875rem",
+              "fontWeight": "600",
+              "display": "flex",
+              "alignItems": "center",
+              "gap": "8px"
+            },
+            "badge": {
+              "backgroundColor": "#E5E7EB",
+              "color": "#6B7280",
+              "padding": "2px 8px",
+              "borderRadius": "9999px",
+              "fontSize": "0.75rem",
+              "fontWeight": "600"
+            }
+          }
+        },
+        "card": {
+          "backgroundColor": "#FFFFFF",
+          "borderRadius": "0.5rem",
+          "padding": "16px",
+          "border": "1px solid #E5E7EB",
+          "cursor": "pointer",
+          "transition": "all 0.2s",
+          "hoverShadow": "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+          "elements": {
+            "title": {
+              "fontSize": "0.875rem",
+              "fontWeight": "600",
+              "color": "#1F2937",
+              "marginBottom": "12px"
+            },
+            "image": {
+              "width": "100%",
+              "height": "120px",
+              "borderRadius": "0.5rem",
+              "objectFit": "cover",
+              "marginBottom": "12px"
+            },
+            "footer": {
+              "display": "flex",
+              "alignItems": "center",
+              "justifyContent": "space-between",
+              "marginTop": "12px"
+            },
+            "priority": {
+              "fontSize": "0.75rem",
+              "fontWeight": "600",
+              "padding": "4px 8px",
+              "borderRadius": "0.25rem",
+              "variants": {
+                "high": {
+                  "backgroundColor": "#FEE2E2",
+                  "color": "#DC2626"
+                },
+                "medium": {
+                  "backgroundColor": "#DBEAFE",
+                  "color": "#2563EB"
+                },
+                "normal": {
+                  "backgroundColor": "#F3F4F6",
+                  "color": "#6B7280"
+                }
+              }
+            },
+            "avatars": {
+              "display": "flex",
+              "marginLeft": "-8px",
+              "avatar": {
+                "width": "24px",
+                "height": "24px",
+                "borderRadius": "9999px",
+                "border": "2px solid #FFFFFF"
+              }
+            },
+            "stats": {
+              "display": "flex",
+              "gap": "12px",
+              "fontSize": "0.75rem",
+              "color": "#9CA3AF",
+              "alignItems": "center"
+            }
+          }
+        }
+      },
+      
+      "notes": {
+        "sidebar": {
+          "width": "320px",
+          "backgroundColor": "#FFFFFF",
+          "padding": "24px",
+          "borderRight": "1px solid #E5E7EB",
+          "searchBar": {
+            "backgroundColor": "#F3F4F6",
+            "borderRadius": "0.5rem",
+            "padding": "10px 16px",
+            "marginBottom": "20px",
+            "fontSize": "0.875rem",
+            "border": "none"
+          }
+        },
+        "noteList": {
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px"
+        },
+        "noteCard": {
+          "padding": "16px",
+          "borderRadius": "0.5rem",
+          "cursor": "pointer",
+          "transition": "all 0.2s",
+          "variants": {
+            "purple": "#EDE9FE",
+            "pink": "#FCE7F3",
+            "yellow": "#FEF3C7",
+            "green": "#D1FAE5",
+            "cyan": "#CFFAFE"
+          },
+          "elements": {
+            "title": {
+              "fontSize": "0.875rem",
+              "fontWeight": "600",
+              "marginBottom": "8px",
+              "overflow": "hidden",
+              "textOverflow": "ellipsis",
+              "whiteSpace": "nowrap"
+            },
+            "date": {
+              "fontSize": "0.75rem",
+              "color": "#6B7280",
+              "display": "flex",
+              "alignItems": "center",
+              "justifyContent": "space-between"
+            }
+          }
+        },
+        "editor": {
+          "padding": "32px",
+          "backgroundColor": "#FFFFFF",
+          "textarea": {
+            "width": "100%",
+            "minHeight": "200px",
+            "border": "1px solid #E5E7EB",
+            "borderRadius": "0.5rem",
+            "padding": "16px",
+            "fontSize": "0.875rem",
+            "lineHeight": "1.6",
+            "resize": "vertical"
+          },
+          "colorPicker": {
+            "display": "flex",
+            "gap": "8px",
+            "marginTop": "16px",
+            "color": {
+              "width": "32px",
+              "height": "32px",
+              "borderRadius": "9999px",
+              "cursor": "pointer",
+              "transition": "transform 0.2s",
+              "hoverTransform": "scale(1.1)"
+            }
+          }
+        }
+      },
+      
+      "inputs": {
+        "text": {
+          "backgroundColor": "#F3F4F6",
+          "border": "1px solid transparent",
+          "borderRadius": "0.5rem",
+          "padding": "10px 16px",
+          "fontSize": "0.875rem",
+          "transition": "all 0.2s",
+          "focusBorderColor": "#6366F1",
+          "focusBackgroundColor": "#FFFFFF"
+        },
+        "select": {
+          "backgroundColor": "#F3F4F6",
+          "border": "1px solid transparent",
+          "borderRadius": "0.5rem",
+          "padding": "10px 16px",
+          "fontSize": "0.875rem",
+          "cursor": "pointer"
+        }
+      },
+      
+      "badges": {
+        "default": {
+          "padding": "4px 12px",
+          "borderRadius": "9999px",
+          "fontSize": "0.75rem",
+          "fontWeight": "600",
+          "display": "inline-flex",
+          "alignItems": "center",
+          "gap": "4px"
+        },
+        "variants": {
+          "success": {
+            "backgroundColor": "#D1FAE5",
+            "color": "#065F46"
+          },
+          "warning": {
+            "backgroundColor": "#FEF3C7",
+            "color": "#92400E"
+          },
+          "error": {
+            "backgroundColor": "#FEE2E2",
+            "color": "#991B1B"
+          },
+          "info": {
+            "backgroundColor": "#DBEAFE",
+            "color": "#1E40AF"
+          }
+        }
+      },
+      
+      "tables": {
+        "container": {
+          "backgroundColor": "#FFFFFF",
+          "borderRadius": "0.75rem",
+          "overflow": "hidden",
+          "border": "1px solid #E5E7EB"
+        },
+        "header": {
+          "backgroundColor": "#F9FAFB",
+          "padding": "12px 16px",
+          "fontSize": "0.75rem",
+          "fontWeight": "600",
+          "color": "#6B7280",
+          "textTransform": "uppercase",
+          "letterSpacing": "0.05em"
+        },
+        "row": {
+          "padding": "16px",
+          "borderBottom": "1px solid #E5E7EB",
+          "fontSize": "0.875rem",
+          "hoverBackgroundColor": "#F9FAFB"
+        }
+      }
+    },
+    
+    "layouts": {
+      "dashboard": {
+        "structure": {
+          "header": "fixed top navigation bar",
+          "content": "main scrollable area with padding",
+          "grid": "responsive grid layout with gap-4 to gap-6"
+        },
+        "gridPatterns": {
+          "heroWithMetrics": {
+            "columns": "2/3 for hero card, 1/3 for metrics stack",
+            "gap": "24px"
+          },
+          "threeColumn": {
+            "columns": "repeat(3, 1fr)",
+            "gap": "24px",
+            "responsive": "stack on mobile"
+          },
+          "twoColumn": {
+            "columns": "repeat(2, 1fr)",
+            "gap": "24px"
+          }
+        }
+      },
+      "application": {
+        "structure": {
+          "header": "fixed top navigation",
+          "sidebar": "optional left sidebar (280-320px)",
+          "main": "flexible content area with padding",
+          "rightPanel": "optional right panel for details"
+        }
+      }
+    },
+    
+    "designPrinciples": {
+      "whitespace": "Generous spacing creates breathing room and visual hierarchy",
+      "colorUsage": "Primary color (indigo) for key actions, multi-color palette for data visualization and categorization",
+      "consistency": "Consistent border radius (0.5rem-1rem), padding patterns, and component spacing",
+      "depth": "Subtle shadows and layered cards create depth without heavy borders",
+      "dataVisualization": "Clean, colorful charts with smooth curves and rounded corners",
+      "interactivity": "Hover states, transitions, and micro-interactions enhance user experience",
+      "accessibility": "High contrast text, clear typography hierarchy, adequate touch targets",
+      "responsiveness": "Fluid layouts that adapt from mobile to desktop"
+    },
+    
+    "animationsAndTransitions": {
+      "default": "all 0.2s ease",
+      "slow": "all 0.3s ease",
+      "fast": "all 0.15s ease",
+      "hoverEffects": {
+        "cards": "subtle shadow increase, slight scale or translate",
+        "buttons": "background color darkening",
+        "links": "color transition"
+      }
+    },
+    
+    "iconography": {
+      "style": "outlined, 24px default size",
+      "library": "lucide-react or similar modern icon set",
+      "usage": "paired with text labels, consistent sizing within components"
+    },
+    
+    "dataVisualization": {
+      "principles": [
+        "Use vibrant, distinguishable colors from the secondary palette",
+        "Smooth curves and rounded edges for modern aesthetic",
+        "Clear labels and legends",
+        "Interactive tooltips on hover",
+        "Responsive sizing that adapts to container"
+      ],
+      "chartTypes": {
+        "line": "Multi-line comparison with smooth curves",
+        "column": "Grouped bars with rounded tops",
+        "donut": "Thick stroke width with center metric",
+        "area": "Filled areas with gradient opacity"
+      }
+    },
+    
+    "responsiveBreakpoints": {
+      "mobile": "< 640px",
+      "tablet": "640px - 1024px",
+      "desktop": "> 1024px",
+      "strategies": {
+        "mobile": "Single column, stacked cards, hamburger menu",
+        "tablet": "Two column grid, visible sidebar",
+        "desktop": "Multi-column layouts, expanded visualizations"
+      }
+    }
+  },
+  
+  "implementationGuidelines": {
+    "techStack": {
+      "framework": "React",
+      "styling": "Tailwind CSS",
+      "charts": "Recharts or ApexCharts",
+      "icons": "Lucide React",
+      "stateManagement": "React hooks or Redux"
+    },
+    
+    "fileStructure": {
+      "components": "Modular, reusable components",
+      "pages": "Page-level components",
+      "layouts": "Layout wrappers",
+      "utils": "Helper functions and constants",
+      "styles": "Global styles and Tailwind config"
+    },
+    
+    "codingConventions": {
+      "naming": "PascalCase for components, camelCase for functions/variables",
+      "styling": "Tailwind utility classes, minimal custom CSS",
+      "props": "Destructured props, prop-types or TypeScript",
+      "composition": "Small, focused components that compose together"
+    },
+    
+    "accessibilityChecklist": [
+      "Semantic HTML elements",
+      "ARIA labels where needed",
+      "Keyboard navigation support",
+      "Focus indicators",
+      "Color contrast ratio minimum 4.5:1",
+      "Screen reader compatible"
+    ]
+  },
+  
+  "usageExamples": {
+    "dashboardCard": {
+      "description": "Standard white card with rounded corners and subtle shadow",
+      "tailwindClasses": "bg-white rounded-lg p-6 shadow-sm"
+    },
+    "primaryButton": {
+      "description": "Indigo button with white text and hover effect",
+      "tailwindClasses": "bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+    },
+    "metricDisplay": {
+      "description": "Large number with label and change indicator",
+      "structure": "label (text-sm text-gray-600) + value (text-3xl font-bold) + change (text-sm font-semibold with color)"
+    },
+    "kanbanCard": {
+      "description": "White card with image, title, priority badge, and metadata",
+      "tailwindClasses": "bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+    }
+  }
+}
