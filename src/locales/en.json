@@ -1,0 +1,56 @@
+{
+  "app": {
+    "title": "Task Manager",
+    "calendar": "Calendar",
+    "board": "Board",
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "board": {
+    "totalTasks": "tasks total",
+    "completed": "completed",
+    "addColumn": "Add Column",
+    "addCard": "Add Card",
+    "taskCompleted": "Task \"{{title}}\" completed!"
+  },
+  "card": {
+    "title": "Title",
+    "description": "Description",
+    "tags": "Tags",
+    "checklist": "Checklist",
+    "edit": "Edit",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "viewStats": "View Stats",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your tasks and productivity",
+    "totalTasks": "Total Tasks",
+    "completedTasks": "Completed",
+    "inProgress": "In Progress",
+    "avgCompletionTime": "Avg Completion Time",
+    "lastSevenDays": "Last 7 Days",
+    "lastThirtyDays": "Last 30 Days",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Configure your task manager preferences",
+    "general": "General",
+    "workDays": "Work Days",
+    "templates": "Templates",
+    "holidays": "Holidays",
+    "appearance": "Appearance",
+    "dataManagement": "Data Management"
+  },
+  "toast": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info"
+  }
+}

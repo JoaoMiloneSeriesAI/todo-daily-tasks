@@ -1,0 +1,56 @@
+{
+  "app": {
+    "title": "Administrador de Tareas",
+    "calendar": "Calendario",
+    "board": "Tablero",
+    "dashboard": "Panel",
+    "settings": "Configuración"
+  },
+  "board": {
+    "totalTasks": "tareas en total",
+    "completed": "completadas",
+    "addColumn": "Agregar Columna",
+    "addCard": "Agregar Tarjeta",
+    "taskCompleted": "¡Tarea \"{{title}}\" completada!"
+  },
+  "card": {
+    "title": "Título",
+    "description": "Descripción",
+    "tags": "Etiquetas",
+    "checklist": "Lista de verificación",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "duplicate": "Duplicar",
+    "viewStats": "Ver Estadísticas",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Resumen de tus tareas y productividad",
+    "totalTasks": "Tareas Totales",
+    "completedTasks": "Completadas",
+    "inProgress": "En Progreso",
+    "avgCompletionTime": "Tiempo Promedio de Finalización",
+    "lastSevenDays": "Últimos 7 Días",
+    "lastThirtyDays": "Últimos 30 Días",
+    "thisMonth": "Este Mes",
+    "lastMonth": "Mes Pasado"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Configura las preferencias de tu administrador de tareas",
+    "general": "General",
+    "workDays": "Días Laborables",
+    "templates": "Plantillas",
+    "holidays": "Días Festivos",
+    "appearance": "Apariencia",
+    "dataManagement": "Gestión de Datos"
+  },
+  "toast": {
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información"
+  }
+}
