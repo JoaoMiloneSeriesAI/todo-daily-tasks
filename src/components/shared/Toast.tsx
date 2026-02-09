@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { create } from 'zustand';
@@ -23,11 +23,7 @@ export const useToastStore = create<ToastStore>((set) => ({
   addToast: (toast) => {
     const id = crypto.randomUUID();
     set((state) => ({ toasts: [...state.toasts, { ...toast, id }] }));
-
-    // Auto remove after duration
-    setTimeout(() => {
-      set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
-    }, toast.duration || 3000);
+    // Timer is handled solely in the ToastItem component — no store-level timer
   },
   removeToast: (id) => {
     set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
@@ -60,37 +56,52 @@ const ToastIcon = ({ type }: { type: ToastType }) => {
   return icons[type];
 };
 
+/// <summary>
+/// Individual toast item with auto-dismiss, pause-on-hover, and dark mode support.
+/// Timer is managed solely here — no duplicate timer in the store.
+/// </summary>
 const ToastItem = ({ toast: toastItem }: { toast: Toast }) => {
   const { removeToast } = useToastStore();
+  const [isPaused, setIsPaused] = useState(false);
+  const duration = toastItem.duration || 3000;
 
   const styles = {
-    success: 'bg-green-50 border-green-200 text-green-900',
-    error: 'bg-red-50 border-red-200 text-red-900',
-    warning: 'bg-yellow-50 border-yellow-200 text-yellow-900',
-    info: 'bg-blue-50 border-blue-200 text-blue-900',
+    success: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-900 dark:text-green-100',
+    error: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-900 dark:text-red-100',
+    warning: 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800 text-yellow-900 dark:text-yellow-100',
+    info: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-100',
   };
 
   const iconColors = {
-    success: 'text-green-600',
-    error: 'text-red-600',
-    warning: 'text-yellow-600',
-    info: 'text-blue-600',
+    success: 'text-green-600 dark:text-green-400',
+    error: 'text-red-600 dark:text-red-400',
+    warning: 'text-yellow-600 dark:text-yellow-400',
+    info: 'text-blue-600 dark:text-blue-400',
   };
 
   useEffect(() => {
+    if (isPaused) return;
+
     const timer = setTimeout(() => {
       removeToast(toastItem.id);
-    }, toastItem.duration || 3000);
+    }, duration);
 
     return () => clearTimeout(timer);
-  }, [toastItem.id, toastItem.duration, removeToast]);
+  }, [toastItem.id, duration, removeToast, isPaused]);
+
+  const handleMouseEnter = useCallback(() => setIsPaused(true), []);
+  const handleMouseLeave = useCallback(() => setIsPaused(false), []);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg ${styles[toastItem.type]}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      role={toastItem.type === 'error' ? 'alert' : 'status'}
+      aria-live={toastItem.type === 'error' ? 'assertive' : 'polite'}
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg max-w-sm ${styles[toastItem.type]}`}
     >
       <div className={iconColors[toastItem.type]}>
         <ToastIcon type={toastItem.type} />
@@ -99,6 +110,7 @@ const ToastItem = ({ toast: toastItem }: { toast: Toast }) => {
       <button
         onClick={() => removeToast(toastItem.id)}
         className="opacity-60 hover:opacity-100 transition-opacity"
+        aria-label="Dismiss"
       >
         <X size={16} />
       </button>
@@ -110,7 +122,7 @@ export function ToastContainer() {
   const { toasts } = useToastStore();
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2 pointer-events-none">
+    <div className="fixed top-4 right-4 z-50 space-y-2 pointer-events-none" aria-live="polite">
       <AnimatePresence>
         {toasts.map((toastItem) => (
           <div key={toastItem.id} className="pointer-events-auto">

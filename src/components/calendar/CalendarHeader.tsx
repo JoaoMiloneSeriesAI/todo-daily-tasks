@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '../shared';
@@ -15,10 +16,12 @@ export function CalendarHeader({
   onNextMonth,
   onToday,
 }: CalendarHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-2">
-        <CalendarIcon className="text-[#6366F1]" size={28} />
+        <CalendarIcon className="text-[var(--color-accent)]" size={28} />
         <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
           {format(currentMonth, 'MMMM yyyy')}
         </h2>
@@ -30,7 +33,7 @@ export function CalendarHeader({
           size="sm"
           onClick={onToday}
         >
-          Today
+          {t('common.today')}
         </Button>
 
         <div className="flex items-center gap-1">

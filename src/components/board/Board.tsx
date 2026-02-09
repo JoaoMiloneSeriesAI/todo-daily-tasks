@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DndContext,
@@ -6,10 +6,12 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
   closestCorners,
 } from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import confetti from 'canvas-confetti';
 import { useBoardStore } from '../../stores/boardStore';
 import { Column } from './Column';
@@ -18,6 +20,7 @@ import { CardModal } from './CardModal';
 import { NerdStatsModal } from './NerdStatsModal';
 import { Card as CardType } from '../../types/card';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 import { Calendar, Plus, ArrowLeft } from 'lucide-react';
 import { Button, Input, Modal } from '../shared';
 import { toast } from '../shared/Toast';
@@ -53,6 +56,9 @@ export function Board({ selectedDate, onBack }: BoardProps) {
       activationConstraint: {
         distance: 8,
       },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
@@ -163,9 +169,11 @@ export function Board({ selectedDate, onBack }: BoardProps) {
     setMigrationTargetId('');
   };
 
-  const columnToDelete = deleteColumnId ? columns.find((c) => c.id === deleteColumnId) : null;
-  const cardsInDeleteColumn = deleteColumnId ? cards.filter((c) => c.columnId === deleteColumnId).length : 0;
-  const otherColumns = columns.filter((c) => c.id !== deleteColumnId);
+  const columnToDelete = useMemo(() => deleteColumnId ? columns.find((c) => c.id === deleteColumnId) : null, [deleteColumnId, columns]);
+  const cardsInDeleteColumn = useMemo(() => deleteColumnId ? cards.filter((c) => c.columnId === deleteColumnId).length : 0, [deleteColumnId, cards]);
+  const otherColumns = useMemo(() => columns.filter((c) => c.id !== deleteColumnId), [deleteColumnId, columns]);
+  const sortedColumns = useMemo(() => [...columns].sort((a, b) => a.position - b.position), [columns]);
+  const doneCount = useMemo(() => cards.filter((c) => c.columnId === 'done').length, [cards]);
 
   const handleMoveCardToNextDay = async (cardId: string) => {
     const { moveCardToDate } = useBoardStore.getState();
@@ -187,13 +195,13 @@ export function Board({ selectedDate, onBack }: BoardProps) {
                 <ArrowLeft size={20} className="text-[var(--color-text-secondary)]" />
               </button>
             )}
-            <Calendar className="text-[#6366F1]" size={28} />
+            <Calendar className="text-[var(--color-accent)]" size={28} />
             <div>
               <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
                 {format(selectedDate, 'EEEE, MMMM d, yyyy')}
               </h2>
               <p className="text-sm text-[var(--color-text-secondary)]">
-                {cards.length} {t('board.tasksTotal')} &bull; {cards.filter((c) => c.columnId === 'done').length}{' '}
+                {cards.length} {t('board.tasksTotal')} &bull; {doneCount}{' '}
                 {t('board.completed')}
               </p>
             </div>
@@ -210,9 +218,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
           onDragEnd={handleDragEnd}
         >
           <div className="flex gap-4 h-full pb-4">
-            {columns
-              .sort((a, b) => a.position - b.position)
-              .map((column) => (
+            {sortedColumns.map((column) => (
                 <Column
                   key={column.id}
                   column={column}
@@ -242,7 +248,11 @@ export function Board({ selectedDate, onBack }: BoardProps) {
 
           <DragOverlay>
             {activeCard ? (
-              <div className="rotate-3">
+              <motion.div
+                initial={{ rotate: 0, scale: 1 }}
+                animate={{ rotate: 3, scale: 1.03 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              >
                 <Card
                   card={activeCard}
                   onEdit={() => {}}
@@ -251,7 +261,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
                   onViewStats={() => {}}
                   onMoveToNextDay={() => {}}
                 />
-              </div>
+              </motion.div>
             ) : null}
           </DragOverlay>
         </DndContext>
@@ -329,12 +339,12 @@ export function Board({ selectedDate, onBack }: BoardProps) {
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="migration" checked={migrationOption === 'moveToTodo'} onChange={() => setMigrationOption('moveToTodo')} className="text-[#6366F1]" />
+                <input type="radio" name="migration" checked={migrationOption === 'moveToTodo'} onChange={() => setMigrationOption('moveToTodo')} className="text-[var(--color-accent)]" />
                 <span className="text-sm text-[var(--color-text-primary)]">{t('board.moveToTodo')}</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="migration" checked={migrationOption === 'moveToColumn'} onChange={() => setMigrationOption('moveToColumn')} className="text-[#6366F1]" />
+                <input type="radio" name="migration" checked={migrationOption === 'moveToColumn'} onChange={() => setMigrationOption('moveToColumn')} className="text-[var(--color-accent)]" />
                 <span className="text-sm text-[var(--color-text-primary)]">{t('board.moveToColumn')}</span>
               </label>
 
@@ -352,7 +362,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
               )}
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="migration" checked={migrationOption === 'deleteAll'} onChange={() => setMigrationOption('deleteAll')} className="text-[#6366F1]" />
+                <input type="radio" name="migration" checked={migrationOption === 'deleteAll'} onChange={() => setMigrationOption('deleteAll')} className="text-[var(--color-accent)]" />
                 <span className="text-sm text-red-600">{t('board.deleteAllCards')}</span>
               </label>
             </div>

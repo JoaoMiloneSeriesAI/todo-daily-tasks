@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TimeByColumnData } from '../../types/board';
 import { TimeTracker } from '../../utils/timeTracking';
@@ -7,6 +8,10 @@ interface TimeSpentChartProps {
 }
 
 export function TimeSpentChart({ data }: TimeSpentChartProps) {
+  const accent = useMemo(() => {
+    return getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || '#6366F1';
+  }, []);
+
   const formattedData = data.map((item) => ({
     ...item,
     timeFormatted: TimeTracker.formatDuration(item.time),
@@ -17,23 +22,24 @@ export function TimeSpentChart({ data }: TimeSpentChartProps) {
     <div className="w-full h-64">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={formattedData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
           <XAxis
             dataKey="columnName"
-            tick={{ fontSize: 12, fill: '#6B7280' }}
-            stroke="#9CA3AF"
+            tick={{ fontSize: 12, fill: 'var(--color-text-secondary)' }}
+            stroke="var(--color-text-tertiary)"
           />
           <YAxis
-            tick={{ fontSize: 12, fill: '#6B7280' }}
-            stroke="#9CA3AF"
+            tick={{ fontSize: 12, fill: 'var(--color-text-secondary)' }}
+            stroke="var(--color-text-tertiary)"
             label={{ value: 'Hours', angle: -90, position: 'insideLeft', fontSize: 12 }}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#fff',
-              border: '1px solid #E5E7EB',
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
               borderRadius: '8px',
               fontSize: '12px',
+              color: 'var(--color-text-primary)',
             }}
             formatter={(value: number | undefined) =>
               value !== undefined ? TimeTracker.formatDuration(value * 1000 * 60 * 60) : ''
@@ -41,7 +47,7 @@ export function TimeSpentChart({ data }: TimeSpentChartProps) {
           />
           <Bar
             dataKey="timeHours"
-            fill="#6366F1"
+            fill={accent}
             radius={[4, 4, 0, 0]}
           />
         </BarChart>

@@ -137,7 +137,7 @@ export function TemplateSettings() {
                 <button
                   key={color.value}
                   onClick={() => setTemplateColor(color.value)}
-                  className={`h-12 rounded-lg transition-all ${templateColor === color.value ? 'ring-2 ring-offset-2 ring-[#6366F1]' : 'hover:opacity-80'}`}
+                  className={`h-12 rounded-lg transition-all ${templateColor === color.value ? 'ring-2 ring-offset-2 ring-[var(--color-accent)]' : 'hover:opacity-80'}`}
                   style={{ backgroundColor: color.value }}
                 >
                   {templateColor === color.value && <Check size={20} className="text-white mx-auto" />}

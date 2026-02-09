@@ -1,9 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Input, Select, Button } from '../shared';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Modal, Input, Select, Button, ConfirmDialog } from '../shared';
 import { Card, ChecklistItem } from '../../types/card';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { X, Plus, Trash2, ArrowRightCircle, Edit, Copy, CheckSquare } from 'lucide-react';
+import { X, Plus, Trash2, ArrowRightCircle, Edit, Copy, CheckSquare, Check } from 'lucide-react';
+
+/// <summary>
+/// Converts a hex color to an rgba string with a given alpha.
+/// Handles 6-char hex safely; returns undefined for invalid input.
+/// </summary>
+function hexToRgba(hex: string | null | undefined, alpha: number): string | undefined {
+  if (!hex || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return undefined;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 interface CardModalProps {
   isOpen: boolean;
@@ -28,6 +41,8 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
   const [checklistInput, setChecklistInput] = useState('');
   const [showAddChecklist, setShowAddChecklist] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (card) {
@@ -68,6 +83,9 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
   const handleInlineSave = () => {
     if (card && title.trim()) {
       onSave({ ...card, title: title.trim(), description: description.trim(), tags, checklist });
+      // Show brief saved indicator
+      setShowSaved(true);
+      setTimeout(() => setShowSaved(false), 1200);
     }
   };
 
@@ -111,7 +129,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all border-2 ${
                 isSelected ? 'border-current' : 'border-transparent opacity-60 hover:opacity-100'
               }`}
-              style={{ backgroundColor: td.color + '20', color: td.color }}
+              style={{ backgroundColor: hexToRgba(td.color, 0.12) || td.color + '20', color: td.color }}
             >
               {td.name}
             </button>
@@ -124,29 +142,44 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
   // VIEW MODE — inline-editable display
   if (mode === 'view' && card) {
     return (
-      <Modal isOpen={isOpen} onClose={() => { handleInlineSave(); onClose(); }} title="" size="lg">
+      <Modal
+        isOpen={isOpen}
+        onClose={() => { handleInlineSave(); onClose(); }}
+        title={title || t('card.editCard')}
+        size="lg"
+        headerColor={template?.color}
+        headerContent={
+          <div className="flex items-center gap-2">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={handleInlineSave}
+              className="w-full text-xl font-bold bg-transparent border-0 outline-none focus:bg-[var(--color-input-bg)] focus:ring-2 focus:ring-[var(--color-accent-ring)] rounded-lg px-2 py-1 -mx-2 transition-all card-title-input"
+              style={{ color: template?.color || 'var(--color-text-primary)' }}
+            />
+            <AnimatePresence>
+              {showSaved && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-1 text-xs text-green-600 whitespace-nowrap flex-shrink-0"
+                >
+                  <Check size={12} /> Saved
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        }
+      >
         <div className="space-y-4">
-          {/* Color bar */}
-          {template && (
-            <div className="h-3 -mx-6 -mt-4 mb-2 rounded-t-lg" style={{ backgroundColor: template.color }} />
-          )}
-
-          {/* Title — inline editable */}
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={handleInlineSave}
-            className="w-full text-xl font-bold text-[var(--color-text-primary)] bg-transparent border-0 outline-none focus:bg-[var(--color-input-bg)] focus:ring-2 focus:ring-[#6366F1]/30 rounded-lg px-2 py-1 -mx-2 transition-all card-title-input"
-            style={{ color: template?.color || undefined }}
-          />
-
           {/* Description — inline editable */}
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             onBlur={handleInlineSave}
             placeholder={t('card.descriptionPlaceholder')}
-            className="w-full text-sm text-[var(--color-text-secondary)] leading-relaxed bg-transparent border-0 outline-none focus:bg-[var(--color-input-bg)] focus:ring-2 focus:ring-[#6366F1]/30 rounded-lg px-2 py-1 -mx-2 transition-all resize-none card-description"
+            className="w-full text-sm text-[var(--color-text-secondary)] leading-relaxed bg-transparent border-0 outline-none focus:bg-[var(--color-input-bg)] focus:ring-2 focus:ring-[var(--color-accent-ring)] rounded-lg px-2 py-1 -mx-2 transition-all resize-none card-description"
             rows={description ? Math.min(description.split('\n').length + 1, 8) : 2}
           />
 
@@ -157,7 +190,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
           {template && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-[var(--color-text-tertiary)]">{t('card.template')}:</span>
-              <span className="text-xs font-medium px-2 py-1 rounded" style={{ backgroundColor: template.color + '20', color: template.color }}>
+              <span className="text-xs font-medium px-2 py-1 rounded" style={{ backgroundColor: hexToRgba(template.color, 0.12) || template.color + '20', color: template.color }}>
                 {template.prefix} {template.name}
               </span>
             </div>
@@ -181,7 +214,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
                       type="checkbox"
                       checked={item.isCompleted}
                       onChange={() => handleToggleChecklistItem(item.id)}
-                      className="w-4 h-4 text-[#6366F1] rounded"
+                      className="w-4 h-4 text-[var(--color-accent)] rounded"
                     />
                     <span className={`flex-1 text-sm ${item.isCompleted ? 'line-through text-[var(--color-text-tertiary)]' : 'text-[var(--color-text-primary)]'}`}>
                       {item.text}
@@ -223,28 +256,40 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
           )}
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-[var(--color-border)]">
-            <Button variant="secondary" size="sm" onClick={() => setMode('edit')}>
-              <Edit size={14} className="mr-1" /> {t('card.edit')}
-            </Button>
-            {onMoveToNextDay && (
-              <Button variant="secondary" size="sm" onClick={() => { handleInlineSave(); onMoveToNextDay(); onClose(); }}>
-                <ArrowRightCircle size={14} className="mr-1" /> {t('card.moveToNextDay')}
+          <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" size="sm" onClick={() => setMode('edit')}>
+                <Edit size={14} className="mr-1" /> {t('card.edit')}
               </Button>
-            )}
-            {onDuplicate && (
-              <Button variant="secondary" size="sm" onClick={() => { onDuplicate(); onClose(); }}>
-                <Copy size={14} className="mr-1" /> {t('card.duplicate')}
-              </Button>
-            )}
+              {onMoveToNextDay && (
+                <Button variant="secondary" size="sm" onClick={() => { handleInlineSave(); onMoveToNextDay(); onClose(); }}>
+                  <ArrowRightCircle size={14} className="mr-1" /> {t('card.moveToNextDay')}
+                </Button>
+              )}
+              {onDuplicate && (
+                <Button variant="secondary" size="sm" onClick={() => { onDuplicate(); onClose(); }}>
+                  <Copy size={14} className="mr-1" /> {t('card.duplicate')}
+                </Button>
+              )}
+            </div>
             {onDelete && (
-              <Button variant="danger" size="sm" onClick={() => {
-                if (confirm(t('card.deleteConfirm'))) { onDelete(); onClose(); }
-              }}>
+              <Button variant="danger" size="sm" onClick={() => setShowDeleteConfirm(true)}>
                 <Trash2 size={14} className="mr-1" /> {t('card.delete')}
               </Button>
             )}
           </div>
+
+          {/* Delete Confirmation Dialog */}
+          <ConfirmDialog
+            isOpen={showDeleteConfirm}
+            onClose={() => setShowDeleteConfirm(false)}
+            onConfirm={() => { onDelete!(); onClose(); }}
+            title={t('card.delete')}
+            message={t('card.deleteConfirm')}
+            confirmLabel={t('card.delete')}
+            cancelLabel={t('common.cancel')}
+            variant="danger"
+          />
         </div>
       </Modal>
     );
@@ -274,7 +319,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={t('card.descriptionPlaceholder')}
-            className="w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1] focus:ring-opacity-20 transition-all duration-200"
+            className="w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-ring)] transition-all duration-200"
             rows={3}
           />
         </div>
@@ -290,7 +335,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
               type="text"
               value={checklistInput}
               onChange={(e) => setChecklistInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAddChecklistItem()}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddChecklistItem()}
               placeholder={t('card.addChecklistItem')}
               className="flex-1 px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm"
             />
@@ -299,7 +344,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
           <div className="space-y-2">
             {checklist.map((item) => (
               <div key={item.id} className="flex items-center gap-2 p-2 bg-[var(--color-bg-tertiary)] rounded-lg">
-                <input type="checkbox" checked={item.isCompleted} onChange={() => handleToggleChecklistItem(item.id)} className="w-4 h-4 text-[#6366F1] rounded" />
+                <input type="checkbox" checked={item.isCompleted} onChange={() => handleToggleChecklistItem(item.id)} className="w-4 h-4 text-[var(--color-accent)] rounded" />
                 <span className={`flex-1 text-sm ${item.isCompleted ? 'line-through text-[var(--color-text-tertiary)]' : 'text-[var(--color-text-primary)]'}`}>{item.text}</span>
                 <button onClick={() => handleRemoveChecklistItem(item.id)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 rounded transition-colors">
                   <Trash2 size={14} />

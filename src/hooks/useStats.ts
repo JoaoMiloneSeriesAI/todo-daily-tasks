@@ -97,8 +97,9 @@ export function useStats(dateRange: DateRange): DashboardStats {
         }
       }
 
+      const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || '#6366F1';
       const chartColors: Record<string, string> = {
-        [COLUMN_IDS.TODO]: '#6366F1',
+        [COLUMN_IDS.TODO]: accentColor,
         [COLUMN_IDS.DOING]: '#EC4899',
         [COLUMN_IDS.DONE]: '#10B981',
       };
@@ -107,7 +108,7 @@ export function useStats(dateRange: DateRange): DashboardStats {
         .map(([columnId, time]) => ({
           columnName: columnNames[columnId] || columnId,
           time,
-          color: chartColors[columnId] || '#6366F1',
+          color: chartColors[columnId] || accentColor,
         }))
         .sort((a, b) => b.time - a.time);
 

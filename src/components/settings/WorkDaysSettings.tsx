@@ -43,7 +43,7 @@ export function WorkDaysSettings() {
                 type="checkbox"
                 checked={isChecked}
                 onChange={() => toggleWorkDay(day.key)}
-                className="w-5 h-5 text-[#6366F1] rounded focus:ring-2 focus:ring-[#6366F1] focus:ring-offset-2"
+                className="w-5 h-5 text-[var(--color-accent)] rounded focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2"
               />
               <span className="text-sm font-medium text-[var(--color-text-primary)]">{day.label}</span>
             </label>

@@ -58,7 +58,7 @@ export function HolidaySettings() {
     setNewHolidayRecurring(false);
   };
 
-  const selectClass = "max-w-md w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1] focus:ring-opacity-20 transition-all duration-200 cursor-pointer disabled:opacity-50";
+  const selectClass = "max-w-md w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-ring)] transition-all duration-200 cursor-pointer disabled:opacity-50";
 
   return (
     <div className="space-y-8">
@@ -91,7 +91,7 @@ export function HolidaySettings() {
               id="autoFetch"
               checked={settings.holidays.autoFetch}
               onChange={(e) => updateSettings({ holidays: { ...settings.holidays, autoFetch: e.target.checked } })}
-              className="w-5 h-5 text-[#6366F1] rounded focus:ring-2 focus:ring-[#6366F1]"
+              className="w-5 h-5 text-[var(--color-accent)] rounded focus:ring-2 focus:ring-[var(--color-accent)]"
             />
             <div>
               <label htmlFor="autoFetch" className="text-sm font-medium text-[var(--color-text-primary)] cursor-pointer">
@@ -136,7 +136,7 @@ export function HolidaySettings() {
               id="recurring"
               checked={newHolidayRecurring}
               onChange={(e) => setNewHolidayRecurring(e.target.checked)}
-              className="w-5 h-5 text-[#6366F1] rounded focus:ring-2 focus:ring-[#6366F1]"
+              className="w-5 h-5 text-[var(--color-accent)] rounded focus:ring-2 focus:ring-[var(--color-accent)]"
             />
             <label htmlFor="recurring" className="text-sm text-[var(--color-text-primary)] cursor-pointer">
               Recurring annually
@@ -158,7 +158,7 @@ export function HolidaySettings() {
                   <p className="font-medium text-[var(--color-text-primary)]">{holiday.name}</p>
                   <p className="text-sm text-[var(--color-text-secondary)]">
                     {format(new Date(holiday.date), 'MMMM d, yyyy')}
-                    {holiday.recurring && <span className="ml-2 text-xs text-[#6366F1]">Recurring</span>}
+                    {holiday.recurring && <span className="ml-2 text-xs text-[var(--color-accent)]">Recurring</span>}
                   </p>
                 </div>
                 <Button variant="secondary" onClick={() => deleteCustomHoliday(holiday.id)} leftIcon={<Trash2 size={14} />} className="text-red-600">

@@ -27,6 +27,14 @@
   --color-shadow: rgba(0, 0, 0, 0.1);
   --color-shadow-sm: rgba(0, 0, 0, 0.05);
   --color-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Accent color system — overridden dynamically by App.tsx from settings */
+  --color-accent: #6366F1;
+  --color-accent-hover: #4F46E5;
+  --color-accent-light: rgba(99, 102, 241, 0.1);
+  --color-accent-ring: rgba(99, 102, 241, 0.3);
+  --color-accent-text: #FFFFFF;
+  --color-accent-secondary: #818CF8;
 }
 
 /* Dark theme */
@@ -58,4 +66,12 @@
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-sm: rgba(0, 0, 0, 0.2);
   --color-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Accent color system — same keys, overridden dynamically */
+  --color-accent: #6366F1;
+  --color-accent-hover: #4F46E5;
+  --color-accent-light: rgba(99, 102, 241, 0.15);
+  --color-accent-ring: rgba(99, 102, 241, 0.4);
+  --color-accent-text: #FFFFFF;
+  --color-accent-secondary: #818CF8;
 }

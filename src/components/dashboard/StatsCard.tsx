@@ -15,9 +15,9 @@ export function StatsCard({ title, value, icon, trend, trendLabel }: StatsCardPr
   const isNegative = hasTrend && trend < 0;
 
   return (
-    <div className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]">
+    <div className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)] transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
       <div className="flex items-center justify-between mb-4">
-        <div className="p-3 bg-[#6366F1]/10 rounded-lg text-[#6366F1]">
+        <div className="p-3 bg-[var(--color-accent-light)] rounded-lg text-[var(--color-accent)]">
           {icon}
         </div>
         {hasTrend && (

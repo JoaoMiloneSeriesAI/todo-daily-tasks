@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Settings as SettingsIcon, Calendar, Tag, Globe, Palette, Database, Tags } from 'lucide-react';
 import { GeneralSettings } from './GeneralSettings';
 import { WorkDaysSettings } from './WorkDaysSettings';
@@ -27,7 +27,7 @@ export function Settings() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] p-6">
+    <div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -50,18 +50,11 @@ export function Settings() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
-                    style={
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? { backgroundColor: '#6366F1', color: '#FFFFFF' }
-                        : { color: 'var(--color-text-primary)' }
-                    }
-                    onMouseEnter={(e) => {
-                      if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
+                        ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)]'
+                        : 'text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
+                    }`}
                   >
                     <Icon size={18} />
                     {tab.label}
@@ -72,14 +65,24 @@ export function Settings() {
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 bg-[var(--color-surface)] rounded-lg shadow-sm border border-[var(--color-border)] p-6">
-            {activeTab === 'general' && <GeneralSettings />}
-            {activeTab === 'workdays' && <WorkDaysSettings />}
-            {activeTab === 'templates' && <TemplateSettings />}
-            {activeTab === 'tags' && <TagSettings />}
-            {activeTab === 'holidays' && <HolidaySettings />}
-            {activeTab === 'appearance' && <AppearanceSettings />}
-            {activeTab === 'data' && <DataManagementSettings />}
+          <div className="flex-1 bg-[var(--color-surface)] rounded-lg shadow-sm border border-[var(--color-border)] p-6 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.15, ease: 'easeInOut' }}
+              >
+                {activeTab === 'general' && <GeneralSettings />}
+                {activeTab === 'workdays' && <WorkDaysSettings />}
+                {activeTab === 'templates' && <TemplateSettings />}
+                {activeTab === 'tags' && <TagSettings />}
+                {activeTab === 'holidays' && <HolidaySettings />}
+                {activeTab === 'appearance' && <AppearanceSettings />}
+                {activeTab === 'data' && <DataManagementSettings />}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>

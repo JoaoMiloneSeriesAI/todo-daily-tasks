@@ -34,7 +34,7 @@ export const Column = memo(function Column({
   onMoveCardToNextDay,
 }: ColumnProps) {
   const { t } = useTranslation();
-  const { setNodeRef } = useDroppable({ id: column.id });
+  const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(column.name);
@@ -58,7 +58,9 @@ export const Column = memo(function Column({
   };
 
   return (
-    <div className="flex flex-col w-80 bg-[var(--color-bg-tertiary)] rounded-lg p-4 h-full">
+    <div className={`flex flex-col w-80 bg-[var(--color-bg-tertiary)] rounded-lg p-4 h-full transition-all duration-200 ${
+      isOver ? 'ring-2 ring-[var(--color-accent-ring)] bg-[var(--color-accent-light)]' : ''
+    }`}>
       {/* Column Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 flex-1 min-w-0">

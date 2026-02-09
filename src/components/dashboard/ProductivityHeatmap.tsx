@@ -12,12 +12,17 @@ const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 /// Determines the heatmap color intensity based on task completion count.
 /// Uses the MatDash indigo palette for consistency with the design system.
 /// </summary>
+/// <summary>
+/// Determines the heatmap color intensity based on task completion count.
+/// Reads the accent color from CSS variables and computes opacity-based shades.
+/// </summary>
 function getColorForCount(count: number): string {
   if (count === 0) return 'var(--color-bg-tertiary)';
-  if (count <= 1) return '#C7D2FE'; // indigo-200
-  if (count <= 2) return '#A5B4FC'; // indigo-300
-  if (count <= 4) return '#818CF8'; // indigo-400
-  return '#6366F1'; // indigo-500 (primary)
+  // Use accent color with varying opacity for intensity levels
+  if (count <= 1) return 'color-mix(in srgb, var(--color-accent) 25%, var(--color-bg-tertiary))';
+  if (count <= 2) return 'color-mix(in srgb, var(--color-accent) 50%, var(--color-bg-tertiary))';
+  if (count <= 4) return 'color-mix(in srgb, var(--color-accent) 75%, var(--color-bg-tertiary))';
+  return 'var(--color-accent)';
 }
 
 export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
@@ -93,7 +98,7 @@ export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
               {week.map((day) => (
                 <div
                   key={day.dateStr}
-                  className="w-4 h-4 rounded-sm cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-[#6366F1] hover:ring-opacity-50"
+                  className="w-4 h-4 rounded-sm cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-[var(--color-accent-ring)]"
                   style={{
                     backgroundColor: day.count < 0 ? 'transparent' : getColorForCount(day.count),
                   }}

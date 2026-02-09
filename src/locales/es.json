@@ -118,5 +118,35 @@
     "holidays": "Dias Festivos",
     "appearance": "Apariencia",
     "dataManagement": "Gestion de Datos"
+  },
+  "appearance": {
+    "title": "Apariencia",
+    "description": "Personaliza la apariencia de tu administrador de tareas",
+    "theme": "Tema",
+    "themeHint": "Elige entre tema claro, oscuro o automatico segun preferencias del sistema",
+    "accentColor": "Color de Acento",
+    "accentColorHint": "Selecciona tu color de acento preferido para botones, enlaces y resaltados",
+    "enableAnimations": "Habilitar Animaciones",
+    "enableAnimationsHint": "Habilita transiciones suaves y animaciones en toda la app"
+  },
+  "onboarding": {
+    "welcome": "Bienvenido a Administrador de Tareas",
+    "welcomeDesc": "Un tablero Kanban basado en calendario para organizar tus tareas diarias. Configuremos algunas cosas para empezar.",
+    "getStarted": "Comenzar",
+    "countryWorkDays": "Pais y Dias Laborables",
+    "countryWorkDaysDesc": "Buscaremos los dias festivos de tu pais",
+    "yourCountry": "Tu Pais",
+    "selectCountry": "Selecciona un pais",
+    "workDays": "Dias Laborables",
+    "back": "Atras",
+    "next": "Siguiente",
+    "languageTheme": "Idioma y Tema",
+    "languageThemeDesc": "Elige tu idioma y apariencia preferidos",
+    "language": "Idioma",
+    "themeLabel": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "auto": "Auto",
+    "startUsing": "Empezar a usar el Administrador de Tareas"
   }
 }

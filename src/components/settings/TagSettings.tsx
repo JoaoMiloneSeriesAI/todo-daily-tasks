@@ -64,7 +64,7 @@ export function TagSettings() {
               <button
                 key={c}
                 onClick={() => setNewColor(c)}
-                className={`w-8 h-8 rounded-lg transition-all ${newColor === c ? 'ring-2 ring-offset-1 ring-[#6366F1] scale-110' : 'hover:scale-105'}`}
+                className={`w-8 h-8 rounded-lg transition-all ${newColor === c ? 'ring-2 ring-offset-1 ring-[var(--color-accent)] scale-110' : 'hover:scale-105'}`}
                 style={{ backgroundColor: c }}
               />
             ))}
@@ -97,7 +97,7 @@ export function TagSettings() {
                       <button
                         key={c}
                         onClick={() => setEditColor(c)}
-                        className={`w-6 h-6 rounded ${editColor === c ? 'ring-2 ring-[#6366F1]' : ''}`}
+                        className={`w-6 h-6 rounded ${editColor === c ? 'ring-2 ring-[var(--color-accent)]' : ''}`}
                         style={{ backgroundColor: c }}
                       />
                     ))}

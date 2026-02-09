@@ -23,7 +23,7 @@ export function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] p-6">
+    <div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -43,7 +43,7 @@ export function Dashboard() {
               onClick={() => setPreset(range.value)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 preset === range.value
-                  ? 'bg-[#6366F1] text-white'
+                  ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)]'
                   : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]'
               }`}
             >
@@ -52,65 +52,46 @@ export function Dashboard() {
           ))}
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards — staggered entrance */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatsCard
-            title={t('dashboard.totalTasks')}
-            value={stats.totalTasks}
-            icon={<ListTodo size={24} />}
-          />
-          <StatsCard
-            title={t('dashboard.completedTasks')}
-            value={stats.completedTasks}
-            icon={<CheckCircle size={24} />}
-            trend={stats.completionTrend}
-            trendLabel={t('dashboard.vsPrevious')}
-          />
-          <StatsCard
-            title={t('dashboard.inProgress')}
-            value={stats.inProgressTasks}
-            icon={<TrendingUp size={24} />}
-          />
-          <StatsCard
-            title={t('dashboard.avgCompletionTime')}
-            value={TimeTracker.formatDuration(stats.avgCompletionTime)}
-            icon={<Clock size={24} />}
-          />
+          {[
+            <StatsCard key="total" title={t('dashboard.totalTasks')} value={stats.totalTasks} icon={<ListTodo size={24} />} />,
+            <StatsCard key="completed" title={t('dashboard.completedTasks')} value={stats.completedTasks} icon={<CheckCircle size={24} />} trend={stats.completionTrend} trendLabel={t('dashboard.vsPrevious')} />,
+            <StatsCard key="progress" title={t('dashboard.inProgress')} value={stats.inProgressTasks} icon={<TrendingUp size={24} />} />,
+            <StatsCard key="avg" title={t('dashboard.avgCompletionTime')} value={TimeTracker.formatDuration(stats.avgCompletionTime)} icon={<Clock size={24} />} />,
+          ].map((card, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05, duration: 0.3 }}
+            >
+              {card}
+            </motion.div>
+          ))}
         </div>
 
-        {/* Charts */}
+        {/* Charts — staggered entrance */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Task Completion Over Time */}
-          <div className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]">
-            <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
-              {t('dashboard.taskCompletionOverTime')}
-            </h2>
-            <TaskCompletionChart data={stats.completionData} />
-          </div>
-
-          {/* Time Spent by Column */}
-          <div className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]">
-            <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
-              {t('dashboard.timeSpentByColumn')}
-            </h2>
-            <TimeSpentChart data={stats.timeByColumn} />
-          </div>
-
-          {/* Tag Distribution */}
-          <div className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]">
-            <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
-              {t('dashboard.tagDistribution')}
-            </h2>
-            <TagDistributionChart data={stats.tagDistribution} />
-          </div>
-
-          {/* Productivity Heatmap */}
-          <div className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]">
-            <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
-              {t('dashboard.dailyProductivity')}
-            </h2>
-            <ProductivityHeatmap data={stats.dailyCompletion} />
-          </div>
+          {[
+            { title: t('dashboard.taskCompletionOverTime'), content: <TaskCompletionChart data={stats.completionData} /> },
+            { title: t('dashboard.timeSpentByColumn'), content: <TimeSpentChart data={stats.timeByColumn} /> },
+            { title: t('dashboard.tagDistribution'), content: <TagDistributionChart data={stats.tagDistribution} /> },
+            { title: t('dashboard.dailyProductivity'), content: <ProductivityHeatmap data={stats.dailyCompletion} /> },
+          ].map((chart, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + i * 0.1, duration: 0.3 }}
+              className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]"
+            >
+              <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
+                {chart.title}
+              </h2>
+              {chart.content}
+            </motion.div>
+          ))}
         </div>
       </motion.div>
     </div>

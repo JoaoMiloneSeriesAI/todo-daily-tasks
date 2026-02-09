@@ -14,25 +14,47 @@ export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClic
   const { t } = useTranslation();
   const isCurrentMonth = isSameMonth(day.date, currentMonth);
   const dayNumber = format(day.date, 'd');
+  const fullDate = format(day.date, 'EEEE, MMMM d, yyyy');
+
+  // Build accessible label
+  const parts = [fullDate];
+  if (day.isToday) parts.push('Today');
+  if (day.isHoliday && day.holidayNames?.length) parts.push(`Holiday: ${day.holidayNames.join(', ')}`);
+  if (day.taskCount > 0) parts.push(`${day.taskCount} tasks, ${day.completedCount} completed`);
+  const ariaLabel = parts.join('. ');
 
   const bgClass = (() => {
-    if (isSelected) return 'bg-[#6366F1]/10';
-    if (day.isToday) return 'bg-[#6366F1]/10';
+    if (isSelected) return 'bg-[var(--color-accent-light)]';
+    if (day.isToday) return 'bg-[var(--color-accent-light)]';
     if (day.isHoliday) return 'bg-red-50 dark:bg-red-900/20';
     if (!day.isWorkDay) return 'bg-[var(--color-bg-tertiary)]';
     return 'bg-[var(--color-surface)]';
   })();
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick(day.date);
+    }
+  };
+
   return (
     <div
+      role="gridcell"
+      tabIndex={0}
+      aria-selected={isSelected}
+      aria-current={day.isToday ? 'date' : undefined}
+      aria-label={ariaLabel}
       onClick={() => onClick(day.date)}
+      onKeyDown={handleKeyDown}
       className={`
         relative min-h-[90px] p-2 rounded-lg cursor-pointer
         border transition-all duration-150 flex flex-col
-        hover:-translate-y-0.5 hover:shadow-md
-        ${isSelected ? 'border-[#6366F1] border-2' : 'border-[var(--color-border)] hover:border-[#818CF8]'}
+        hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97]
+        focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none
+        ${isSelected ? 'border-[var(--color-accent)] border-2' : 'border-[var(--color-border)] hover:border-[var(--color-accent-secondary)]'}
         ${!isCurrentMonth ? 'opacity-40' : ''}
-        ${day.isToday ? 'ring-2 ring-[#6366F1] ring-offset-1' : ''}
+        ${day.isToday ? 'ring-2 ring-[var(--color-accent)] ring-offset-1' : ''}
         ${bgClass}
       `}
     >
@@ -42,7 +64,7 @@ export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClic
           className={`
             text-xs leading-none
             ${day.isToday
-              ? 'font-bold text-white bg-[#6366F1] w-6 h-6 rounded-full flex items-center justify-center'
+              ? 'font-bold text-[var(--color-accent-text)] bg-[var(--color-accent)] w-6 h-6 rounded-full flex items-center justify-center'
               : 'font-semibold text-[var(--color-text-primary)]'
             }
           `}
@@ -59,13 +81,13 @@ export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClic
             {day.holidayNames.slice(0, 2).map((name, i) => (
               <div
                 key={i}
-                className="text-[9px] leading-tight font-medium text-red-600 dark:text-red-400 truncate"
+                className="text-[10px] leading-tight font-medium text-red-600 dark:text-red-400 truncate"
               >
                 {name}
               </div>
             ))}
             {day.holidayNames.length > 2 && (
-              <div className="text-[8px] text-red-400">+{day.holidayNames.length - 2}</div>
+              <div className="text-[10px] text-red-400">+{day.holidayNames.length - 2}</div>
             )}
           </div>
         )}
@@ -74,12 +96,12 @@ export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClic
         {day.cardTitles && day.cardTitles.length > 0 && (
           <div className="space-y-px">
             {day.cardTitles.slice(0, 2).map((title, i) => (
-              <div key={i} className="text-[9px] leading-tight text-[var(--color-text-secondary)] truncate">
+              <div key={i} className="text-[10px] leading-tight text-[var(--color-text-secondary)] truncate">
                 {title}
               </div>
             ))}
             {day.cardTitles.length > 2 && (
-              <div className="text-[8px] text-[var(--color-text-tertiary)]">
+              <div className="text-[10px] text-[var(--color-text-tertiary)]">
                 +{day.cardTitles.length - 2} {t('common.more').toLowerCase()}
               </div>
             )}
@@ -99,7 +121,7 @@ export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClic
                 }}
               />
             </div>
-            <span className="text-[8px] text-[var(--color-text-tertiary)] tabular-nums">
+            <span className="text-[10px] text-[var(--color-text-tertiary)] tabular-nums">
               {day.completedCount}/{day.taskCount}
             </span>
           </div>

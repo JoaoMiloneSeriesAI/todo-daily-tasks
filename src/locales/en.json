@@ -118,5 +118,35 @@
     "holidays": "Holidays",
     "appearance": "Appearance",
     "dataManagement": "Data Management"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "description": "Customize the look and feel of your task manager",
+    "theme": "Theme",
+    "themeHint": "Choose between light, dark, or automatic theme based on system preferences",
+    "accentColor": "Accent Color",
+    "accentColorHint": "Select your preferred accent color for buttons, links, and highlights",
+    "enableAnimations": "Enable Animations",
+    "enableAnimationsHint": "Enable smooth transitions and animations throughout the app"
+  },
+  "onboarding": {
+    "welcome": "Welcome to Task Manager",
+    "welcomeDesc": "A calendar-based Kanban board to organize your daily tasks. Let's set up a few things to get you started.",
+    "getStarted": "Get Started",
+    "countryWorkDays": "Country & Work Days",
+    "countryWorkDaysDesc": "We'll fetch public holidays for your country",
+    "yourCountry": "Your Country",
+    "selectCountry": "Select a country",
+    "workDays": "Work Days",
+    "back": "Back",
+    "next": "Next",
+    "languageTheme": "Language & Theme",
+    "languageThemeDesc": "Choose your preferred language and appearance",
+    "language": "Language",
+    "themeLabel": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto",
+    "startUsing": "Start Using Task Manager"
   }
 }

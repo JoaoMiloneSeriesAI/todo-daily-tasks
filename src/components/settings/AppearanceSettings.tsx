@@ -20,7 +20,7 @@ export function AppearanceSettings() {
     { value: '#3B82F6', label: 'Blue', color: '#3B82F6' },
   ];
 
-  const selectClass = "max-w-xs w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1] focus:ring-opacity-20 transition-all duration-200 cursor-pointer";
+  const selectClass = "max-w-xs w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-ring)] transition-all duration-200 cursor-pointer";
 
   return (
     <div className="space-y-6">
@@ -99,7 +99,7 @@ export function AppearanceSettings() {
                 appearance: { ...settings.appearance, enableAnimations: e.target.checked },
               })
             }
-            className="w-5 h-5 text-[#6366F1] rounded focus:ring-2 focus:ring-[#6366F1]"
+            className="w-5 h-5 text-[var(--color-accent)] rounded focus:ring-2 focus:ring-[var(--color-accent)]"
           />
           <div>
             <p className="text-sm font-medium text-[var(--color-text-primary)]">Enable Animations</p>

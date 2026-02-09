@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { useTranslation } from 'react-i18next';
 import { Country } from '../../types/calendar';
@@ -8,10 +9,6 @@ import { CheckCircle, ChevronRight, Globe, Calendar, Palette } from 'lucide-reac
 interface OnboardingProps {
   onComplete: () => void;
 }
-
-const ACCENT = '#6366F1';
-const ACCENT_DARK = '#4F46E5';
-const ACCENT_BG = 'rgba(99, 102, 241, 0.1)';
 
 export function Onboarding({ onComplete }: OnboardingProps) {
   const { settings, updateSettings } = useSettingsStore();
@@ -58,11 +55,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const steps = [
     // Step 0: Welcome
     <div key="welcome" className="text-center">
-      <div
-        className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
-        style={{ backgroundColor: ACCENT_BG }}
-      >
-        <CheckCircle size={40} style={{ color: ACCENT }} />
+      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 bg-[var(--color-accent-light)]">
+        <CheckCircle size={40} className="text-[var(--color-accent)]" />
       </div>
       <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-3">
         Welcome to Task Manager
@@ -73,10 +67,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       </p>
       <button
         onClick={() => setStep(1)}
-        className="px-8 py-3 text-white rounded-lg font-semibold text-lg transition-colors inline-flex items-center gap-2"
-        style={{ backgroundColor: ACCENT }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ACCENT_DARK)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = ACCENT)}
+        className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold text-lg transition-colors inline-flex items-center gap-2"
       >
         Get Started <ChevronRight size={20} />
       </button>
@@ -85,8 +76,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     // Step 1: Country and Work Days
     <div key="workdays">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg" style={{ backgroundColor: ACCENT_BG }}>
-          <Globe size={24} style={{ color: ACCENT }} />
+        <div className="p-2 rounded-lg bg-[var(--color-accent-light)]">
+          <Globe size={24} className="text-[var(--color-accent)]" />
         </div>
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Country &amp; Work Days</h2>
@@ -116,11 +107,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               <button
                 key={day.key}
                 onClick={() => toggleWorkDay(day.key)}
-                className="flex-1 py-3 rounded-lg text-sm font-medium transition-colors"
-                style={{
-                  backgroundColor: workDays[day.key] ? ACCENT : 'var(--color-bg-tertiary)',
-                  color: workDays[day.key] ? '#FFFFFF' : 'var(--color-text-secondary)',
-                }}
+                className={`flex-1 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  workDays[day.key]
+                    ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)]'
+                    : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]'
+                }`}
               >
                 {day.label}
               </button>
@@ -138,10 +129,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         </button>
         <button
           onClick={() => setStep(2)}
-          className="px-8 py-3 text-white rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
-          style={{ backgroundColor: ACCENT }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ACCENT_DARK)}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = ACCENT)}
+          className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
         >
           Next <ChevronRight size={20} />
         </button>
@@ -151,8 +139,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     // Step 2: Language and Theme
     <div key="appearance">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg" style={{ backgroundColor: ACCENT_BG }}>
-          <Palette size={24} style={{ color: ACCENT }} />
+        <div className="p-2 rounded-lg bg-[var(--color-accent-light)]">
+          <Palette size={24} className="text-[var(--color-accent)]" />
         </div>
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Language &amp; Theme</h2>
@@ -176,12 +164,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               <button
                 key={t}
                 onClick={() => setTheme(t)}
-                className="py-3 px-4 rounded-lg text-sm font-medium transition-colors border-2"
-                style={{
-                  borderColor: theme === t ? ACCENT : 'var(--color-border)',
-                  backgroundColor: theme === t ? ACCENT_BG : 'transparent',
-                  color: theme === t ? ACCENT : 'var(--color-text-secondary)',
-                }}
+                className={`py-3 px-4 rounded-lg text-sm font-medium transition-colors border-2 ${
+                  theme === t
+                    ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)] text-[var(--color-accent)]'
+                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-tertiary)]'
+                }`}
               >
                 {t === 'light' ? 'Light' : t === 'dark' ? 'Dark' : 'Auto'}
               </button>
@@ -199,10 +186,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         </button>
         <button
           onClick={handleComplete}
-          className="px-8 py-3 text-white rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
-          style={{ backgroundColor: ACCENT }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ACCENT_DARK)}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = ACCENT)}
+          className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
         >
           <Calendar size={20} /> Start Using Task Manager
         </button>
@@ -221,14 +205,24 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               className="h-2 rounded-full transition-all duration-300"
               style={{
                 width: s === step ? '2rem' : '0.5rem',
-                backgroundColor: s <= step ? ACCENT : 'var(--color-border)',
+                backgroundColor: s <= step ? 'var(--color-accent)' : 'var(--color-border)',
                 opacity: s < step ? 0.5 : 1,
               }}
             />
           ))}
         </div>
 
-        {steps[step]}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+          >
+            {steps[step]}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
