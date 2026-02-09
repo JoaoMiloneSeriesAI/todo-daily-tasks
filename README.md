@@ -1,171 +1,135 @@
-# Task Manager - Cross-Platform Desktop App
+# Task Manager
 
-A beautiful, feature-rich task management application built with Electron, React, and TypeScript.
+A desktop app for organizing daily tasks using a calendar-based Kanban board. Each day gets its own board with columns (TODO, Doing, Done, and custom ones). Built for macOS and Windows.
 
-## 🚀 Quick Start
+---
 
-### Development Mode
+## Getting Started
 
-**macOS:**
-```bash
-# Double-click to run
-./run-dev.command
+You need **Node.js** installed. Download it from [nodejs.org](https://nodejs.org) (choose the LTS version).
 
-# Or use npm
-npm run dev:electron
-```
+### Run the App (for testing)
 
-**Windows:**
-```bash
-# Double-click to run
-run-dev.bat
+| Platform | What to do |
+|---|---|
+| **macOS** | Double-click `run-dev.command` |
+| **Windows** | Double-click `run-dev.bat` |
 
-# Or use npm
-npm run dev:electron
-```
+The first time, it will install dependencies automatically. After that, the app window opens.
 
-### Building for Production
+### Run the Tests
 
-**Build for macOS:**
-```bash
-# Double-click to run
-./build-mac.command
+| Platform | What to do |
+|---|---|
+| **macOS** | Double-click `run-tests.command` |
+| **Windows** | Double-click `run-tests.bat` |
 
-# Or use npm
-npm run build:mac
-```
+Or from a terminal: `npm test`
 
-**Build for Windows:**
-```bash
-# Double-click to run
-build-windows.bat
+### Build the App (create installers)
 
-# Or use npm
-npm run build:win
-```
+| What you want | macOS | Windows |
+|---|---|---|
+| Build for macOS | Double-click `build-mac.command` | Not possible from Windows |
+| Build for Windows | Double-click `build-all.command` | Double-click `build-windows.bat` |
+| Build for both | Double-click `build-all.command` | Double-click `build-all.bat` (Windows only) |
 
-**Build for Both Platforms:**
-```bash
-# macOS only
-./build-all.command
+Build files appear in the **`Builds/`** folder.
 
-# Or use npm
-npm run build:all
-```
+> **Note:** macOS builds (DMG files) can only be created on a Mac. Windows builds can be created from either platform.
 
-## ✨ Features
+---
 
-### ✅ Implemented
-- **Calendar View** - Monthly calendar with holiday integration and work day indicators
-- **Kanban Board** - Drag-and-drop task management with custom columns
-- **Card Management** - Create, edit, and organize tasks with templates
-- **Checklist Support** - Add subtasks to any card
-- **Tag System** - Categorize tasks with custom tags
-- **Data Persistence** - Local storage using electron-store
-- **Holiday Integration** - Fetch holidays from OpenHolidaysAPI
-- **Export/Import** - Backup and restore your data
+## What's in the Builds Folder
 
-### 🚧 Coming Soon
-- Time Tracking System with "Nerd Stats"
-- Analytics Dashboard with charts
-- Settings Page (work days, templates, holidays)
-- Animations and polish
-- Multi-language support (English, Spanish)
+After building, you'll find:
 
-## 🛠️ Tech Stack
+- **macOS:** `.dmg` installer (Apple Silicon + Intel) and `.zip` archive
+- **Windows:** `.exe` installer and portable `.exe` (no install needed)
 
-- **Framework:** Electron.js v29+
-- **UI:** React v18+ with TypeScript v5+
-- **Styling:** Tailwind CSS v4 with MatDash Design System
-- **State Management:** Zustand
-- **Drag & Drop:** dnd-kit
-- **Animations:** Framer Motion
-- **Charts:** Recharts
-- **Date Handling:** date-fns
-- **Build Tool:** Vite v5+
-- **Packaging:** Electron Builder
+---
 
-## 📁 Project Structure
+## Features
+
+- **Calendar View** -- Monthly calendar showing tasks, holidays, and work/non-work days
+- **Kanban Board** -- Drag-and-drop cards between TODO, Doing, Done, and custom columns
+- **Card Management** -- Templates, colored tags, checklists, descriptions
+- **Click to View/Edit** -- Click a card to see details, edit inline, or switch to full edit mode
+- **Move to Next Day** -- Send incomplete tasks to the next work day
+- **Holiday Integration** -- Automatic public holidays from OpenHolidaysAPI (40+ countries)
+- **Dark Mode** -- Light, dark, or system-based theme
+- **Multi-Language** -- English and Spanish
+- **Time Tracking** -- See how long tasks spend in each column ("Nerd Stats")
+- **Dashboard** -- Charts showing task completion, time breakdown, and tag distribution
+- **Settings** -- Work days, templates, tags, holidays, appearance, data export/import
+- **First-Time Setup** -- Guided wizard for country, work days, language, and theme
+- **Local Storage** -- All data stays on your computer, no cloud needed
+
+---
+
+## Terminal Commands
+
+If you prefer using the terminal instead of double-clicking scripts:
+
+| Action | Command |
+|---|---|
+| Run the app | `npm run dev` |
+| Run tests | `npm test` |
+| Run tests in watch mode | `npm run test:watch` |
+| Build for macOS | `npm run build:mac` |
+| Build for Windows | `npm run build:win` |
+| Build for both | `npm run build:all` |
+| Test holiday API | `npm run test:holidays` |
+
+---
+
+## Project Structure
 
 ```
 todo-daily-tasks/
-├── electron/              # Electron main process
-│   ├── main/             # Main process code
-│   │   ├── index.ts      # Entry point
-│   │   ├── window.ts     # Window management
-│   │   └── services/     # Data, holiday, export services
-│   └── preload/          # Preload scripts (IPC bridge)
-├── src/                  # React application
-│   ├── components/       # React components
-│   │   ├── calendar/     # Calendar view
-│   │   ├── board/        # Kanban board
-│   │   └── shared/       # Reusable components
-│   ├── stores/           # Zustand state management
-│   ├── types/            # TypeScript definitions
-│   ├── utils/            # Helper functions
-│   └── styles/           # Global styles
-├── public/               # Static assets
-└── release/              # Built applications (after build)
+  electron/           -- Desktop app shell (Electron main process)
+    main/             -- Window management, IPC handlers, services
+    preload/          -- Secure bridge between app and desktop
+  src/                -- The app itself (React)
+    components/       -- UI screens (calendar, board, dashboard, settings)
+    stores/           -- App state (Zustand)
+    types/            -- TypeScript definitions
+    utils/            -- Helper functions (time tracking, validators, etc.)
+    services/         -- IPC communication layer
+    locales/          -- Translations (English, Spanish)
+    styles/           -- CSS and theme files
+  scripts/            -- Diagnostic tools (holiday API tester)
+  Builds/             -- Built apps appear here after running a build
+  public/icons/       -- App icons (PNG, ICNS, ICO)
 ```
 
-## 🎨 Design System
+---
 
-- **Primary Color:** Indigo (#6366F1)
-- **Secondary Colors:** Pink, Cyan, Teal, Green, Yellow
-- **Font:** Inter
-- **Design:** MatDash - Modern dashboard aesthetic
+## Troubleshooting
 
-## 📦 Build Output
+**"Node.js is not installed"** -- Download and install from [nodejs.org](https://nodejs.org). Restart your terminal after installing.
 
-After building, find your apps in the `release/` folder:
+**App shows a blank screen** -- Make sure you're running `npm run dev`, not opening the HTML file directly.
 
-**macOS:**
-- `.dmg` - Installer disk image
-- `.zip` - Portable archive
-- Universal build (Intel + Apple Silicon)
+**Build fails** -- Try deleting `node_modules` and running the script again. It will reinstall everything.
 
-**Windows:**
-- `.exe` - NSIS installer
-- Portable `.exe` - No installation required
+**Holidays not showing** -- Run `npm run test:holidays` to check if the API has data for your country and year. Some countries don't have future-year data yet.
 
-## 🔧 Development Scripts
+---
 
-```bash
-npm run dev              # Start Vite dev server
-npm run dev:electron     # Start Electron with hot reload
-npm run build            # Build for production
-npm run build:mac        # Package for macOS
-npm run build:win        # Package for Windows
-npm run build:all        # Package for both platforms
-npm run lint             # Run ESLint
-```
+## Tech Stack
 
-## 🐛 Troubleshooting
+- Electron 40 + React 19 + TypeScript 5
+- Tailwind CSS 4 for styling
+- Zustand for state management
+- dnd-kit for drag and drop
+- Recharts for dashboard charts
+- date-fns for date handling
+- Vite 7 for building
+- Vitest for testing
 
-### npm cache issues
-```bash
-sudo chown -R $(id -u):$(id -g) "/Users/$(whoami)/.npm"
-npm cache clean --force
-```
+---
 
-### Port already in use
-```bash
-# Kill process on port 5173
-lsof -ti:5173 | xargs kill -9
-```
-
-### Build fails
-```bash
-# Clean and rebuild
-rm -rf node_modules dist dist-electron release
-npm install
-npm run build
-```
-
-## 📝 License
+## License
 
 MIT
-
-## 👥 Author
-
-Built with ❤️ using Claude Code
