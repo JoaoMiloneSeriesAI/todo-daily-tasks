@@ -57,46 +57,36 @@ export function Calendar({ onDayClick }: CalendarProps) {
         onToday={goToToday}
       />
 
-      {/* Loading skeleton or holiday banner */}
-      {isLoadingHolidays && days.length === 0 ? (
-        <div className="mb-4">
-          {/* Skeleton grid */}
-          <div className="grid grid-cols-7 gap-2 mb-2">
-            {weekDays.map((day) => (
-              <div key={day} className="text-center text-sm font-semibold text-[var(--color-text-secondary)] py-2">
-                {day}
-              </div>
-            ))}
+      {/* Week day headers */}
+      <div className="grid grid-cols-7 gap-2 mb-2">
+        {weekDays.map((day) => (
+          <div
+            key={day}
+            className="text-center text-sm font-semibold text-[var(--color-text-secondary)] py-2"
+          >
+            {day}
           </div>
-          <div className="grid grid-cols-7 gap-2">
-            {Array.from({ length: 35 }).map((_, i) => (
-              <div key={i} className="min-h-[90px] rounded-lg animate-shimmer" />
-            ))}
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Week day headers */}
-          <div className="grid grid-cols-7 gap-2 mb-2">
-            {weekDays.map((day) => (
-              <div
-                key={day}
-                className="text-center text-sm font-semibold text-[var(--color-text-secondary)] py-2"
-              >
-                {day}
-              </div>
-            ))}
-          </div>
+        ))}
+      </div>
 
-          {/* Calendar grid with month transition */}
+      {/* Fixed-height calendar grid — rows stretch to fill, like Google Calendar */}
+      <div className="h-[540px]">
+        {isLoadingHolidays && days.length === 0 ? (
+          <div className="grid grid-cols-7 gap-2 h-full" style={{ gridTemplateRows: 'repeat(5, 1fr)' }}>
+            {Array.from({ length: 35 }).map((_, i) => (
+              <div key={i} className="rounded-lg animate-shimmer" />
+            ))}
+          </div>
+        ) : (
           <AnimatePresence mode="wait">
             <motion.div
               key={currentMonth.toISOString()}
               initial={{ opacity: 0, x: direction * 40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction * -40 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="grid grid-cols-7 gap-2"
+              transition={{ duration: 0.2, ease: 'easeInOut' as const }}
+              className="grid grid-cols-7 gap-2 h-full"
+              style={{ gridTemplateRows: `repeat(${Math.ceil(days.length / 7)}, 1fr)` }}
             >
               {days.map((day) => (
                 <CalendarDay
@@ -109,8 +99,8 @@ export function Calendar({ onDayClick }: CalendarProps) {
               ))}
             </motion.div>
           </AnimatePresence>
-        </>
-      )}
+        )}
+      </div>
 
       {/* Legend — responsive wrap */}
       <div className="mt-6 flex items-center gap-4 flex-wrap text-sm text-[var(--color-text-secondary)]">

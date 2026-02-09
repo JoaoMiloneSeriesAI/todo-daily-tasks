@@ -14,6 +14,7 @@ import {
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import confetti from 'canvas-confetti';
 import { useBoardStore } from '../../stores/boardStore';
+import { useCalendarStore } from '../../stores/calendarStore';
 import { Column } from './Column';
 import { Card } from './Card';
 import { CardModal } from './CardModal';
@@ -21,7 +22,7 @@ import { NerdStatsModal } from './NerdStatsModal';
 import { Card as CardType } from '../../types/card';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { Calendar, Plus, ArrowLeft } from 'lucide-react';
+import { Calendar, Plus, ArrowLeft, PartyPopper } from 'lucide-react';
 import { Button, Input, Modal } from '../shared';
 import { toast } from '../shared/Toast';
 
@@ -34,6 +35,14 @@ export function Board({ selectedDate, onBack }: BoardProps) {
   const { t } = useTranslation();
   const { columns, cards, getCardsByColumn, moveCard, addCard, updateCard, deleteCard, duplicateCard, addColumn, updateColumn, deleteColumn } =
     useBoardStore();
+  const { holidays } = useCalendarStore();
+
+  // Check if the selected date is a holiday
+  const dateStr = format(selectedDate, 'yyyy-MM-dd');
+  const holidaysOnDate = useMemo(
+    () => holidays.filter((h) => h.date === dateStr),
+    [holidays, dateStr]
+  );
 
   const [activeCard, setActiveCard] = useState<CardType | null>(null);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
@@ -200,10 +209,18 @@ export function Board({ selectedDate, onBack }: BoardProps) {
               <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
                 {format(selectedDate, 'EEEE, MMMM d, yyyy')}
               </h2>
-              <p className="text-sm text-[var(--color-text-secondary)]">
-                {cards.length} {t('board.tasksTotal')} &bull; {doneCount}{' '}
-                {t('board.completed')}
-              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm text-[var(--color-text-secondary)]">
+                  {cards.length} {t('board.tasksTotal')} &bull; {doneCount}{' '}
+                  {t('board.completed')}
+                </p>
+                {holidaysOnDate.length > 0 && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
+                    <PartyPopper size={12} />
+                    {holidaysOnDate.map((h) => h.name).join(', ')}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>

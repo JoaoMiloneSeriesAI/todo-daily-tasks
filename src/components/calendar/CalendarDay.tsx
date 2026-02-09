@@ -48,7 +48,7 @@ export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClic
       onClick={() => onClick(day.date)}
       onKeyDown={handleKeyDown}
       className={`
-        relative min-h-[90px] p-2 rounded-lg cursor-pointer
+        relative h-full p-2 rounded-lg cursor-pointer
         border transition-all duration-150 flex flex-col
         hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97]
         focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none
