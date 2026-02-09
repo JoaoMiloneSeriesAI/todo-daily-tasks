@@ -5,6 +5,7 @@
 module.exports = {
   appId: 'com.taskmanager.app',
   productName: 'Task Manager',
+  publish: null,
   directories: {
     output: 'Builds',
     buildResources: 'resources',
