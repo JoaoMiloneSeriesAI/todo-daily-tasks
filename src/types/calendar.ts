@@ -4,8 +4,10 @@ export interface CalendarDay {
   isWorkDay: boolean;
   isHoliday: boolean;
   holidayName?: string;
+  holidayNames?: string[];
   taskCount: number;
   completedCount: number;
+  cardTitles?: string[];
 }
 
 export interface Holiday {

@@ -17,7 +17,7 @@ export function StatsCard({ title, value, icon, trend, trendLabel }: StatsCardPr
   return (
     <div className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]">
       <div className="flex items-center justify-between mb-4">
-        <div className="p-3 bg-primary-main/10 rounded-lg text-primary-main">
+        <div className="p-3 bg-[#6366F1]/10 rounded-lg text-[#6366F1]">
           {icon}
         </div>
         {hasTrend && (

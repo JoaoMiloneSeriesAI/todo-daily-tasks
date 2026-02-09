@@ -3,6 +3,8 @@ export interface AppSettings {
   workDays: WorkDaysSettings;
   holidays: HolidaySettings;
   appearance: AppearanceSettings;
+  tags?: TagDefinition[];
+  hasCompletedOnboarding?: boolean;
 }
 
 export interface GeneralSettings {
@@ -43,6 +45,21 @@ export interface AppearanceSettings {
   enableSounds: boolean;
 }
 
+export interface TagDefinition {
+  id: string;
+  name: string;
+  color: string; // hex color
+}
+
+export const DEFAULT_TAGS: TagDefinition[] = [
+  { id: 'tag-bug', name: 'bug', color: '#EF4444' },
+  { id: 'tag-feature', name: 'feature', color: '#10B981' },
+  { id: 'tag-urgent', name: 'urgent', color: '#F59E0B' },
+  { id: 'tag-docs', name: 'docs', color: '#3B82F6' },
+  { id: 'tag-design', name: 'design', color: '#8B5CF6' },
+  { id: 'tag-review', name: 'review', color: '#EC4899' },
+];
+
 // Default settings
 export const DEFAULT_SETTINGS: AppSettings = {
   general: {
@@ -71,4 +88,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
     enableAnimations: true,
     enableSounds: true,
   },
+  tags: DEFAULT_TAGS,
 };

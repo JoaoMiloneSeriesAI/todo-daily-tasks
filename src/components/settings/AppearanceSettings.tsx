@@ -20,18 +20,20 @@ export function AppearanceSettings() {
     { value: '#3B82F6', label: 'Blue', color: '#3B82F6' },
   ];
 
+  const selectClass = "max-w-xs w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1] focus:ring-opacity-20 transition-all duration-200 cursor-pointer";
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Appearance</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">Appearance</h2>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-6">
           Customize the look and feel of your task manager
         </p>
       </div>
 
       {/* Theme */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Theme</label>
         <select
           value={settings.appearance.theme}
           onChange={(e) =>
@@ -42,7 +44,7 @@ export function AppearanceSettings() {
               },
             })
           }
-          className="max-w-xs w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:bg-white focus:border-primary-main focus:ring-2 focus:ring-primary-main focus:ring-opacity-20 transition-all duration-200 cursor-pointer"
+          className={selectClass}
         >
           {themes.map((theme) => (
             <option key={theme.value} value={theme.value}>
@@ -50,14 +52,14 @@ export function AppearanceSettings() {
             </option>
           ))}
         </select>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
           Choose between light, dark, or automatic theme based on system preferences
         </p>
       </div>
 
       {/* Accent Color */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">Accent Color</label>
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-3">Accent Color</label>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {accentColors.map((color) => (
             <button
@@ -69,26 +71,26 @@ export function AppearanceSettings() {
               }
               className={`p-3 rounded-lg border-2 transition-all ${
                 settings.appearance.accentColor === color.value
-                  ? 'border-gray-900 shadow-md'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-[var(--color-text-primary)] shadow-md'
+                  : 'border-[var(--color-border)] hover:border-[var(--color-text-tertiary)]'
               }`}
             >
               <div
                 className="w-full h-12 rounded-md mb-2"
                 style={{ backgroundColor: color.color }}
               />
-              <p className="text-xs text-gray-700 font-medium text-center">{color.label}</p>
+              <p className="text-xs text-[var(--color-text-secondary)] font-medium text-center">{color.label}</p>
             </button>
           ))}
         </div>
-        <p className="text-xs text-gray-500 mt-3">
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-3">
           Select your preferred accent color for buttons, links, and highlights
         </p>
       </div>
 
       {/* Animations */}
       <div>
-        <label className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors">
+        <label className="flex items-center gap-3 p-4 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] cursor-pointer transition-colors">
           <input
             type="checkbox"
             checked={settings.appearance.enableAnimations}
@@ -97,43 +99,15 @@ export function AppearanceSettings() {
                 appearance: { ...settings.appearance, enableAnimations: e.target.checked },
               })
             }
-            className="w-5 h-5 text-primary-main rounded focus:ring-2 focus:ring-primary-main"
+            className="w-5 h-5 text-[#6366F1] rounded focus:ring-2 focus:ring-[#6366F1]"
           />
           <div>
-            <p className="text-sm font-medium text-gray-700">Enable Animations</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">Enable Animations</p>
+            <p className="text-xs text-[var(--color-text-tertiary)]">
               Enable smooth transitions and animations throughout the app
             </p>
           </div>
         </label>
-      </div>
-
-      {/* Preview */}
-      <div className="pt-6 border-t border-gray-200">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">Preview</h3>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white">
-          <div className="flex items-center gap-4 mb-4">
-            <button
-              className="px-4 py-2 rounded-lg text-white font-medium transition-colors"
-              style={{ backgroundColor: settings.appearance.accentColor }}
-            >
-              Primary Button
-            </button>
-            <button className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
-              Secondary Button
-            </button>
-          </div>
-          <div className="space-y-2">
-            <div
-              className="h-2 rounded-full"
-              style={{ backgroundColor: settings.appearance.accentColor, width: '60%' }}
-            />
-            <div
-              className="h-2 rounded-full opacity-50"
-              style={{ backgroundColor: settings.appearance.accentColor, width: '40%' }}
-            />
-          </div>
-        </div>
       </div>
     </div>
   );

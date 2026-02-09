@@ -98,7 +98,7 @@ const ToastItem = ({ toast: toastItem }: { toast: Toast }) => {
       <p className="flex-1 text-sm font-medium">{toastItem.message}</p>
       <button
         onClick={() => removeToast(toastItem.id)}
-        className="text-gray-500 hover:text-gray-700 transition-colors"
+        className="opacity-60 hover:opacity-100 transition-opacity"
       >
         <X size={16} />
       </button>

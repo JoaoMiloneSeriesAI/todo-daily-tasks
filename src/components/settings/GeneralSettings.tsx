@@ -5,7 +5,7 @@ export function GeneralSettings() {
   const { settings, updateSettings } = useSettingsStore();
   const { i18n } = useTranslation();
 
-  const selectClass = "max-w-xs w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-primary-main focus:ring-2 focus:ring-primary-main focus:ring-opacity-20 transition-all duration-200 cursor-pointer";
+  const selectClass = "max-w-xs w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1] focus:ring-opacity-20 transition-all duration-200 cursor-pointer";
 
   return (
     <div className="space-y-6">

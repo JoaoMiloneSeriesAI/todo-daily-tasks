@@ -23,7 +23,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             w-full px-4 py-2
             bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg
             text-[var(--color-text-primary)] text-sm
-            focus:bg-[var(--color-input-focus-bg)] focus:border-primary-main focus:ring-2 focus:ring-primary-main focus:ring-opacity-20
+            focus:bg-[var(--color-input-focus-bg)] focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1] focus:ring-opacity-20
             disabled:opacity-50 disabled:cursor-not-allowed
             transition-all duration-200
             ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}

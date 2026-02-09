@@ -18,7 +18,7 @@ export function CalendarHeader({
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-2">
-        <CalendarIcon className="text-primary-main" size={28} />
+        <CalendarIcon className="text-[#6366F1]" size={28} />
         <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
           {format(currentMonth, 'MMMM yyyy')}
         </h2>

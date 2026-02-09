@@ -1,7 +1,6 @@
-import { ReactNode } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { ReactNode, ButtonHTMLAttributes } from 'react';
 
-interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'icon' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   children: ReactNode;
@@ -21,10 +20,10 @@ export function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseStyles = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'font-semibold rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]';
 
   const variantStyles = {
-    primary: 'bg-primary-main text-white hover:bg-primary-dark focus:ring-primary-main',
+    primary: 'bg-[#6366F1] text-white hover:bg-[#4F46E5] focus:ring-[#6366F1]',
     secondary: 'bg-[var(--color-surface-active)] text-[var(--color-text-primary)] hover:bg-[var(--color-border)] focus:ring-[var(--color-border)]',
     icon: 'bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] focus:ring-[var(--color-border)]',
     danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500',
@@ -37,9 +36,7 @@ export function Button({
   };
 
   return (
-    <motion.button
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
+    <button
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       disabled={disabled || isLoading}
       {...props}
@@ -59,6 +56,6 @@ export function Button({
           {rightIcon && <span>{rightIcon}</span>}
         </span>
       )}
-    </motion.button>
+    </button>
   );
 }

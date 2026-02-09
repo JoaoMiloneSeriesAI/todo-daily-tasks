@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCalendarStore } from '../../stores/calendarStore';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { CalendarHeader } from './CalendarHeader';
@@ -12,6 +13,7 @@ interface CalendarProps {
 }
 
 export function Calendar({ onDayClick }: CalendarProps) {
+  const { t } = useTranslation();
   const {
     currentMonth,
     selectedDate,
@@ -21,16 +23,14 @@ export function Calendar({ onDayClick }: CalendarProps) {
     goToNextMonth,
     goToToday,
     setSelectedDate,
-    generateCalendarDays,
-    loadHolidays,
+    ensureHolidaysLoaded,
   } = useCalendarStore();
 
   const { settings } = useSettingsStore();
 
-  // Initialize calendar
+  // Initialize calendar — ensureHolidaysLoaded handles caching and calendar generation
   useEffect(() => {
-    generateCalendarDays();
-    loadHolidays(currentMonth.getFullYear());
+    ensureHolidaysLoaded(currentMonth.getFullYear());
   }, [currentMonth]);
 
   // Get week day headers
@@ -54,7 +54,7 @@ export function Calendar({ onDayClick }: CalendarProps) {
         <div className="mb-4">
           <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
             <LoadingSpinner size="sm" />
-            <span>Loading holidays...</span>
+            <span>{t('calendar.loadingHolidays')}</span>
           </div>
         </div>
       )}
@@ -87,20 +87,20 @@ export function Calendar({ onDayClick }: CalendarProps) {
       {/* Legend */}
       <div className="mt-6 flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded border-2 border-primary-main" />
-          <span>Selected</span>
+          <div className="w-4 h-4 rounded border-2 border-[#6366F1]" />
+          <span>{t('common.selected')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded ring-2 ring-primary-main" />
-          <span>Today</span>
+          <div className="w-4 h-4 rounded ring-2 ring-[#6366F1]" />
+          <span>{t('common.today')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-red-50 dark:bg-red-900/20 border-2 border-[var(--color-border)]" />
-          <span>Holiday</span>
+          <span>{t('common.holiday')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-[var(--color-bg-tertiary)] border-2 border-[var(--color-border)]" />
-          <span>Non-work day</span>
+          <span>{t('common.nonWorkDay')}</span>
         </div>
       </div>
     </div>

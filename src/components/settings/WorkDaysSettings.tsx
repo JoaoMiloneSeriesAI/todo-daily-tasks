@@ -25,8 +25,8 @@ export function WorkDaysSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Work Days</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">Work Days</h2>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-6">
           Select which days of the week are work days. These will be highlighted in the calendar.
         </p>
       </div>
@@ -37,22 +37,22 @@ export function WorkDaysSettings() {
           return (
             <label
               key={day.key}
-              className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] cursor-pointer transition-colors"
             >
               <input
                 type="checkbox"
                 checked={isChecked}
                 onChange={() => toggleWorkDay(day.key)}
-                className="w-5 h-5 text-primary-main rounded focus:ring-2 focus:ring-primary-main focus:ring-offset-2"
+                className="w-5 h-5 text-[#6366F1] rounded focus:ring-2 focus:ring-[#6366F1] focus:ring-offset-2"
               />
-              <span className="text-sm font-medium text-gray-700">{day.label}</span>
+              <span className="text-sm font-medium text-[var(--color-text-primary)]">{day.label}</span>
             </label>
           );
         })}
       </div>
 
-      <div className="pt-4 border-t border-gray-200">
-        <p className="text-xs text-gray-500">
+      <div className="pt-4 border-t border-[var(--color-border)]">
+        <p className="text-xs text-[var(--color-text-tertiary)]">
           Work days are used to distinguish between regular work days and weekends/holidays in the
           calendar view.
         </p>

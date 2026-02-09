@@ -23,6 +23,20 @@ body {
   min-height: 100vh;
 }
 
+/* Prevent text selection on the entire app by default */
+#root {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Explicitly allow text selection only in content areas */
+input, textarea, [contenteditable],
+.selectable, p.selectable,
+.card-description, .card-title-input {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 0.5rem;

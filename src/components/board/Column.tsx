@@ -1,4 +1,5 @@
 import { useState, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Column as ColumnType } from '../../types/column';
@@ -32,9 +33,8 @@ export const Column = memo(function Column({
   onDeleteColumn,
   onMoveCardToNextDay,
 }: ColumnProps) {
-  const { setNodeRef } = useDroppable({
-    id: column.id,
-  });
+  const { t } = useTranslation();
+  const { setNodeRef } = useDroppable({ id: column.id });
 
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(column.name);
@@ -86,21 +86,19 @@ export const Column = memo(function Column({
             <h3
               className={`font-semibold text-sm text-[var(--color-text-primary)] truncate ${!column.isStatic ? 'cursor-pointer' : ''}`}
               onDoubleClick={handleDoubleClick}
-              title={!column.isStatic ? 'Double-click to rename' : undefined}
+              title={!column.isStatic ? t('board.renameTooltip') : undefined}
             >
               {column.name}
             </h3>
           )}
-          <Badge variant="default" size="sm">
-            {cards.length}
-          </Badge>
+          <Badge variant="default" size="sm">{cards.length}</Badge>
         </div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={onAddCard}
             className="p-1.5 hover:bg-[var(--color-surface-active)] rounded transition-colors"
-            title="Add card"
+            title={t('board.addCardTooltip')}
           >
             <Plus size={16} className="text-[var(--color-text-secondary)]" />
           </button>
@@ -109,7 +107,7 @@ export const Column = memo(function Column({
             <button
               onClick={onDeleteColumn}
               className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
-              title="Delete column"
+              title={t('board.deleteColumnTooltip')}
             >
               <Trash2 size={16} className="text-[var(--color-text-secondary)] hover:text-red-600" />
             </button>
@@ -118,14 +116,8 @@ export const Column = memo(function Column({
       </div>
 
       {/* Cards Container */}
-      <div
-        ref={setNodeRef}
-        className="flex-1 space-y-3 overflow-y-auto min-h-[200px]"
-      >
-        <SortableContext
-          items={cards.map((card) => card.id)}
-          strategy={verticalListSortingStrategy}
-        >
+      <div ref={setNodeRef} className="flex-1 space-y-3 overflow-y-auto min-h-[200px]">
+        <SortableContext items={cards.map((card) => card.id)} strategy={verticalListSortingStrategy}>
           {cards.map((card) => (
             <Card
               key={card.id}
@@ -141,7 +133,7 @@ export const Column = memo(function Column({
 
         {cards.length === 0 && (
           <div className="flex items-center justify-center h-32 text-[var(--color-text-tertiary)] text-sm">
-            No cards yet
+            {t('board.noCards')}
           </div>
         )}
       </div>
@@ -151,7 +143,7 @@ export const Column = memo(function Column({
         onClick={onAddCard}
         className="mt-4 w-full py-2 px-4 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] text-sm font-medium rounded-lg border border-[var(--color-border)] transition-colors"
       >
-        + Add Card
+        {t('board.addCard')}
       </button>
     </div>
   );

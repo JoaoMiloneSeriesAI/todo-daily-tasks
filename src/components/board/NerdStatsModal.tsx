@@ -93,7 +93,7 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
                 </div>
                 <div className="w-full h-2 bg-[var(--color-bg-tertiary)] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-primary-main to-primary-light transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-[#6366F1] to-[#818CF8] transition-all duration-500"
                     style={{ width: `${item.percentage}%` }}
                   />
                 </div>
@@ -123,7 +123,7 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
                     <div className="flex flex-col items-center">
                       <div className={`w-3 h-3 rounded-full ${
                         index === movements.length - 1
-                          ? 'bg-primary-main'
+                          ? 'bg-[#6366F1]'
                           : 'bg-[var(--color-border)]'
                       }`} />
                       {index < movements.length - 1 && (

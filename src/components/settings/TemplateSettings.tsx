@@ -49,27 +49,12 @@ export function TemplateSettings() {
   };
 
   const handleSave = () => {
-    const tags = templateTags
-      .split(',')
-      .map((t) => t.trim())
-      .filter((t) => t.length > 0);
-
+    const tags = templateTags.split(',').map((t) => t.trim()).filter((t) => t.length > 0);
     if (editingTemplate) {
-      updateTemplate(editingTemplate.id, {
-        name: templateName,
-        prefix: templatePrefix,
-        color: templateColor,
-        defaultTags: tags,
-      });
+      updateTemplate(editingTemplate.id, { name: templateName, prefix: templatePrefix, color: templateColor, defaultTags: tags });
     } else {
-      addTemplate({
-        name: templateName,
-        prefix: templatePrefix,
-        color: templateColor,
-        defaultTags: tags,
-      });
+      addTemplate({ name: templateName, prefix: templatePrefix, color: templateColor, defaultTags: tags });
     }
-
     handleCloseModal();
   };
 
@@ -83,8 +68,8 @@ export function TemplateSettings() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">Templates</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-1">Templates</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">
             Create reusable templates for common task types
           </p>
         </div>
@@ -93,18 +78,17 @@ export function TemplateSettings() {
         </Button>
       </div>
 
-      {/* Templates List */}
       <div className="space-y-3">
         {templates.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-gray-600 mb-2">No templates yet</p>
-            <p className="text-sm text-gray-500">Create your first template to get started</p>
+          <div className="text-center py-12 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border)]">
+            <p className="text-[var(--color-text-secondary)] mb-2">No templates yet</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">Create your first template to get started</p>
           </div>
         ) : (
           templates.map((template) => (
             <div
               key={template.id}
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-between p-4 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] transition-colors"
             >
               <div className="flex items-center gap-4">
                 <div
@@ -114,14 +98,11 @@ export function TemplateSettings() {
                   {template.prefix}
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900">{template.name}</h3>
+                  <h3 className="font-medium text-[var(--color-text-primary)]">{template.name}</h3>
                   {template.defaultTags.length > 0 && (
                     <div className="flex gap-1 mt-1">
                       {template.defaultTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded"
-                        >
+                        <span key={tag} className="text-xs px-2 py-1 bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] rounded">
                           {tag}
                         </span>
                       ))}
@@ -130,103 +111,48 @@ export function TemplateSettings() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  onClick={() => handleOpenModal(template)}
-                  leftIcon={<Edit2 size={14} />}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => handleDelete(template.id)}
-                  leftIcon={<Trash2 size={14} />}
-                  className="text-red-600 hover:bg-red-50"
-                >
-                  Delete
-                </Button>
+                <Button variant="secondary" onClick={() => handleOpenModal(template)} leftIcon={<Edit2 size={14} />}>Edit</Button>
+                <Button variant="secondary" onClick={() => handleDelete(template.id)} leftIcon={<Trash2 size={14} />} className="text-red-600">Delete</Button>
               </div>
             </div>
           ))
         )}
       </div>
 
-      {/* Template Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        title={editingTemplate ? 'Edit Template' : 'Add Template'}
-      >
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingTemplate ? 'Edit Template' : 'Add Template'}>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Template Name
-            </label>
-            <Input
-              value={templateName}
-              onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="e.g., Bug Fix, Feature, Meeting"
-            />
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Template Name</label>
+            <Input value={templateName} onChange={(e) => setTemplateName(e.target.value)} placeholder="e.g., Bug Fix, Feature, Meeting" />
           </div>
-
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Prefix</label>
-            <Input
-              value={templatePrefix}
-              onChange={(e) => setTemplatePrefix(e.target.value.toUpperCase())}
-              placeholder="e.g., BUG, FEAT"
-              maxLength={6}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Short prefix to identify tasks of this type (max 6 characters)
-            </p>
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Prefix</label>
+            <Input value={templatePrefix} onChange={(e) => setTemplatePrefix(e.target.value.toUpperCase())} placeholder="e.g., BUG, FEAT" maxLength={6} />
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Short prefix to identify tasks of this type (max 6 characters)</p>
           </div>
-
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Color</label>
             <div className="grid grid-cols-4 gap-2">
               {colors.map((color) => (
                 <button
                   key={color.value}
                   onClick={() => setTemplateColor(color.value)}
-                  className={`h-12 rounded-lg transition-all ${
-                    templateColor === color.value
-                      ? 'ring-2 ring-offset-2 ring-primary-main'
-                      : 'hover:opacity-80'
-                  }`}
+                  className={`h-12 rounded-lg transition-all ${templateColor === color.value ? 'ring-2 ring-offset-2 ring-[#6366F1]' : 'hover:opacity-80'}`}
                   style={{ backgroundColor: color.value }}
                 >
-                  {templateColor === color.value && (
-                    <Check size={20} className="text-white mx-auto" />
-                  )}
+                  {templateColor === color.value && <Check size={20} className="text-white mx-auto" />}
                 </button>
               ))}
             </div>
           </div>
-
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Default Tags
-            </label>
-            <Input
-              value={templateTags}
-              onChange={(e) => setTemplateTags(e.target.value)}
-              placeholder="e.g., urgent, backend, frontend (comma separated)"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Tags that will be automatically added to new cards
-            </p>
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Default Tags</label>
+            <Input value={templateTags} onChange={(e) => setTemplateTags(e.target.value)} placeholder="e.g., urgent, backend (comma separated)" />
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Tags that will be automatically added to new cards</p>
           </div>
-
           <div className="flex justify-end gap-2 pt-4">
-            <Button variant="secondary" onClick={handleCloseModal} leftIcon={<X size={16} />}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!templateName || !templatePrefix}
-              leftIcon={<Check size={16} />}
-            >
+            <Button variant="secondary" onClick={handleCloseModal} leftIcon={<X size={16} />}>Cancel</Button>
+            <Button onClick={handleSave} disabled={!templateName || !templatePrefix} leftIcon={<Check size={16} />}>
               {editingTemplate ? 'Save Changes' : 'Create Template'}
             </Button>
           </div>

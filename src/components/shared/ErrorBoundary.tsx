@@ -39,23 +39,23 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-            <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+        <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center p-6">
+          <div className="max-w-md w-full bg-[var(--color-surface)] rounded-lg shadow-lg p-8">
+            <div className="flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full mx-auto mb-4">
               <AlertTriangle className="text-red-600" size={32} />
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)] text-center mb-2">
               Something went wrong
             </h2>
 
-            <p className="text-gray-600 text-center mb-6">
-              An unexpected error occurred. The error has been logged and we'll look into it.
+            <p className="text-[var(--color-text-secondary)] text-center mb-6">
+              An unexpected error occurred. The error has been logged.
             </p>
 
             {this.state.error && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-sm font-mono text-gray-700 break-words">
+              <div className="mb-6 p-4 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border)]">
+                <p className="text-sm font-mono text-[var(--color-text-primary)] break-words">
                   {this.state.error.message}
                 </p>
               </div>
@@ -73,17 +73,6 @@ export class ErrorBoundary extends Component<Props, State> {
                 Reload App
               </Button>
             </div>
-
-            {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
-              <details className="mt-6">
-                <summary className="text-sm text-gray-600 cursor-pointer hover:text-gray-900">
-                  Stack Trace (Development only)
-                </summary>
-                <pre className="mt-2 text-xs bg-gray-900 text-gray-100 p-4 rounded overflow-auto max-h-64">
-                  {this.state.errorInfo.componentStack}
-                </pre>
-              </details>
-            )}
           </div>
         </div>
       );

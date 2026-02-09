@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Settings as SettingsIcon, Calendar, Tag, Globe, Palette, Database } from 'lucide-react';
+import { Settings as SettingsIcon, Calendar, Tag, Globe, Palette, Database, Tags } from 'lucide-react';
 import { GeneralSettings } from './GeneralSettings';
 import { WorkDaysSettings } from './WorkDaysSettings';
 import { TemplateSettings } from './TemplateSettings';
 import { HolidaySettings } from './HolidaySettings';
 import { AppearanceSettings } from './AppearanceSettings';
 import { DataManagementSettings } from './DataManagementSettings';
+import { TagSettings } from './TagSettings';
 
-type SettingsTab = 'general' | 'workdays' | 'templates' | 'holidays' | 'appearance' | 'data';
+type SettingsTab = 'general' | 'workdays' | 'templates' | 'tags' | 'holidays' | 'appearance' | 'data';
 
 export function Settings() {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ export function Settings() {
     { id: 'general' as const, label: t('settings.general'), icon: SettingsIcon },
     { id: 'workdays' as const, label: t('settings.workDays'), icon: Calendar },
     { id: 'templates' as const, label: t('settings.templates'), icon: Tag },
+    { id: 'tags' as const, label: t('settings.tags') || 'Tags', icon: Tags },
     { id: 'holidays' as const, label: t('settings.holidays'), icon: Globe },
     { id: 'appearance' as const, label: t('settings.appearance'), icon: Palette },
     { id: 'data' as const, label: t('settings.dataManagement'), icon: Database },
@@ -48,11 +50,18 @@ export function Settings() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
+                    style={
                       isActive
-                        ? 'bg-primary-main text-white'
-                        : 'text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
-                    }`}
+                        ? { backgroundColor: '#6366F1', color: '#FFFFFF' }
+                        : { color: 'var(--color-text-primary)' }
+                    }
+                    onMouseEnter={(e) => {
+                      if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
                   >
                     <Icon size={18} />
                     {tab.label}
@@ -67,6 +76,7 @@ export function Settings() {
             {activeTab === 'general' && <GeneralSettings />}
             {activeTab === 'workdays' && <WorkDaysSettings />}
             {activeTab === 'templates' && <TemplateSettings />}
+            {activeTab === 'tags' && <TagSettings />}
             {activeTab === 'holidays' && <HolidaySettings />}
             {activeTab === 'appearance' && <AppearanceSettings />}
             {activeTab === 'data' && <DataManagementSettings />}

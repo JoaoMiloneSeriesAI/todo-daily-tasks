@@ -21,14 +21,15 @@
     "holiday": "Holiday",
     "nonWorkDay": "Non-work day",
     "less": "Less",
-    "more": "More"
+    "more": "more",
+    "backToCalendar": "Back to Calendar"
   },
   "calendar": {
     "loadingHolidays": "Loading holidays...",
     "tasks": "tasks"
   },
   "board": {
-    "totalTasks": "tasks total",
+    "tasksTotal": "tasks total",
     "completed": "completed",
     "addColumn": "Add Column",
     "addCard": "+ Add Card",
@@ -45,7 +46,11 @@
     "deleteAllCards": "Delete all cards in this column",
     "selectColumn": "Select column...",
     "columnName": "Column Name",
-    "createColumn": "Create Column"
+    "columnNamePlaceholder": "Enter column name...",
+    "createColumn": "Create Column",
+    "renameTooltip": "Double-click to rename",
+    "addCardTooltip": "Add card",
+    "deleteColumnTooltip": "Delete column"
   },
   "card": {
     "newCard": "New Card",
@@ -109,6 +114,7 @@
     "general": "General",
     "workDays": "Work Days",
     "templates": "Templates",
+    "tags": "Tags",
     "holidays": "Holidays",
     "appearance": "Appearance",
     "dataManagement": "Data Management"

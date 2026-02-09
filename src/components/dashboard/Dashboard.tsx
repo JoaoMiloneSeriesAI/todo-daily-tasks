@@ -43,7 +43,7 @@ export function Dashboard() {
               onClick={() => setPreset(range.value)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 preset === range.value
-                  ? 'bg-primary-main text-white'
+                  ? 'bg-[#6366F1] text-white'
                   : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]'
               }`}
             >

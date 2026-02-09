@@ -93,7 +93,7 @@ export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
               {week.map((day) => (
                 <div
                   key={day.dateStr}
-                  className="w-4 h-4 rounded-sm cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-primary-main hover:ring-opacity-50"
+                  className="w-4 h-4 rounded-sm cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-[#6366F1] hover:ring-opacity-50"
                   style={{
                     backgroundColor: day.count < 0 ? 'transparent' : getColorForCount(day.count),
                   }}

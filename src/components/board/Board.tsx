@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DndContext,
   DragEndEvent,
@@ -17,15 +18,17 @@ import { CardModal } from './CardModal';
 import { NerdStatsModal } from './NerdStatsModal';
 import { Card as CardType } from '../../types/card';
 import { format } from 'date-fns';
-import { Calendar, Plus } from 'lucide-react';
+import { Calendar, Plus, ArrowLeft } from 'lucide-react';
 import { Button, Input, Modal } from '../shared';
 import { toast } from '../shared/Toast';
 
 interface BoardProps {
   selectedDate: Date;
+  onBack?: () => void;
 }
 
-export function Board({ selectedDate }: BoardProps) {
+export function Board({ selectedDate, onBack }: BoardProps) {
+  const { t } = useTranslation();
   const { columns, cards, getCardsByColumn, moveCard, addCard, updateCard, deleteCard, duplicateCard, addColumn, updateColumn, deleteColumn } =
     useBoardStore();
 
@@ -97,7 +100,7 @@ export function Board({ selectedDate }: BoardProps) {
         origin: { y: 0.6 },
         colors: ['#6366F1', '#EC4899', '#14B8A6', '#F59E0B'],
       });
-      toast.success(`Task "${card?.title}" completed!`);
+      toast.success(t('board.taskCompleted', { title: card?.title }));
     }
 
     setActiveCard(null);
@@ -142,7 +145,7 @@ export function Board({ selectedDate }: BoardProps) {
     addColumn(newColumnName.trim());
     setNewColumnName('');
     setIsAddColumnModalOpen(false);
-    toast.success(`Column "${newColumnName.trim()}" created`);
+    toast.success(t('board.columnCreated', { name: newColumnName.trim() }));
   };
 
   const handleRenameColumn = (columnId: string, newName: string) => {
@@ -154,7 +157,7 @@ export function Board({ selectedDate }: BoardProps) {
     if (!deleteColumnId) return;
     deleteColumn(deleteColumnId, migrationOption, migrationTargetId || undefined);
     const columnName = columns.find((c) => c.id === deleteColumnId)?.name;
-    toast.info(`Column "${columnName}" deleted`);
+    toast.info(t('board.columnDeleted', { name: columnName }));
     setDeleteColumnId(null);
     setMigrationOption('moveToTodo');
     setMigrationTargetId('');
@@ -175,14 +178,23 @@ export function Board({ selectedDate }: BoardProps) {
       <div className="bg-[var(--color-surface)] rounded-xl shadow-sm p-6 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Calendar className="text-primary-main" size={28} />
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="p-2 hover:bg-[var(--color-surface-hover)] rounded-lg transition-colors -ml-2 mr-1"
+                title={t('common.backToCalendar')}
+              >
+                <ArrowLeft size={20} className="text-[var(--color-text-secondary)]" />
+              </button>
+            )}
+            <Calendar className="text-[#6366F1]" size={28} />
             <div>
               <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
                 {format(selectedDate, 'EEEE, MMMM d, yyyy')}
               </h2>
               <p className="text-sm text-[var(--color-text-secondary)]">
-                {cards.length} tasks total &bull; {cards.filter((c) => c.columnId === 'done').length}{' '}
-                completed
+                {cards.length} {t('board.tasksTotal')} &bull; {cards.filter((c) => c.columnId === 'done').length}{' '}
+                {t('board.completed')}
               </p>
             </div>
           </div>
@@ -223,7 +235,7 @@ export function Board({ selectedDate }: BoardProps) {
                 className="w-full py-3 px-4 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] text-sm font-medium rounded-lg border-2 border-dashed border-[var(--color-border)] transition-colors flex items-center justify-center gap-2"
               >
                 <Plus size={16} />
-                Add Column
+                {t('board.addColumn')}
               </button>
             </div>
           </div>
@@ -252,6 +264,9 @@ export function Board({ selectedDate }: BoardProps) {
         onSave={handleSaveCard}
         card={editingCard}
         columnId={selectedColumnId}
+        onMoveToNextDay={editingCard ? () => handleMoveCardToNextDay(editingCard.id) : undefined}
+        onDuplicate={editingCard ? () => duplicateCard(editingCard.id) : undefined}
+        onDelete={editingCard ? () => deleteCard(editingCard.id) : undefined}
       />
 
       {/* Nerd Stats Modal */}
@@ -267,24 +282,24 @@ export function Board({ selectedDate }: BoardProps) {
       <Modal
         isOpen={isAddColumnModalOpen}
         onClose={() => { setIsAddColumnModalOpen(false); setNewColumnName(''); }}
-        title="Add Column"
+        title={t('board.addColumn')}
         size="sm"
       >
         <div className="space-y-4">
           <Input
-            label="Column Name"
+            label={t('board.columnName')}
             required
             value={newColumnName}
             onChange={(e) => setNewColumnName(e.target.value)}
-            placeholder="Enter column name..."
+            placeholder={t('board.columnNamePlaceholder')}
             onKeyDown={(e) => e.key === 'Enter' && handleAddColumn()}
           />
           <div className="flex gap-2 justify-end">
             <Button variant="secondary" onClick={() => { setIsAddColumnModalOpen(false); setNewColumnName(''); }}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button variant="primary" onClick={handleAddColumn}>
-              Create Column
+              {t('board.createColumn')}
             </Button>
           </div>
         </div>
@@ -294,15 +309,15 @@ export function Board({ selectedDate }: BoardProps) {
       <Modal
         isOpen={!!deleteColumnId}
         onClose={() => setDeleteColumnId(null)}
-        title="Delete Column"
+        title={t('board.deleteColumnTitle')}
         size="md"
       >
         <div className="space-y-4">
           <p className="text-[var(--color-text-primary)]">
-            Are you sure you want to delete <strong>{columnToDelete?.name}</strong>?
+            {t('board.deleteColumnConfirm')} <strong>{columnToDelete?.name}</strong>?
             {cardsInDeleteColumn > 0 && (
               <span className="text-[var(--color-text-secondary)]">
-                {' '}{cardsInDeleteColumn} card{cardsInDeleteColumn !== 1 ? 's' : ''} will be affected.
+                {' '}{t('board.cardsAffected', { count: cardsInDeleteColumn })}
               </span>
             )}
           </p>
@@ -310,29 +325,17 @@ export function Board({ selectedDate }: BoardProps) {
           {cardsInDeleteColumn > 0 && (
             <div className="space-y-3">
               <label className="block text-sm font-medium text-[var(--color-text-primary)]">
-                What should happen to the cards?
+                {t('board.migrationQuestion')}
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="migration"
-                  checked={migrationOption === 'moveToTodo'}
-                  onChange={() => setMigrationOption('moveToTodo')}
-                  className="text-primary-main"
-                />
-                <span className="text-sm text-[var(--color-text-primary)]">Move all cards to TODO</span>
+                <input type="radio" name="migration" checked={migrationOption === 'moveToTodo'} onChange={() => setMigrationOption('moveToTodo')} className="text-[#6366F1]" />
+                <span className="text-sm text-[var(--color-text-primary)]">{t('board.moveToTodo')}</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="migration"
-                  checked={migrationOption === 'moveToColumn'}
-                  onChange={() => setMigrationOption('moveToColumn')}
-                  className="text-primary-main"
-                />
-                <span className="text-sm text-[var(--color-text-primary)]">Move to another column:</span>
+                <input type="radio" name="migration" checked={migrationOption === 'moveToColumn'} onChange={() => setMigrationOption('moveToColumn')} className="text-[#6366F1]" />
+                <span className="text-sm text-[var(--color-text-primary)]">{t('board.moveToColumn')}</span>
               </label>
 
               {migrationOption === 'moveToColumn' && (
@@ -341,7 +344,7 @@ export function Board({ selectedDate }: BoardProps) {
                   onChange={(e) => setMigrationTargetId(e.target.value)}
                   className="w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm"
                 >
-                  <option value="">Select column...</option>
+                  <option value="">{t('board.selectColumn')}</option>
                   {otherColumns.map((col) => (
                     <option key={col.id} value={col.id}>{col.name}</option>
                   ))}
@@ -349,28 +352,22 @@ export function Board({ selectedDate }: BoardProps) {
               )}
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="migration"
-                  checked={migrationOption === 'deleteAll'}
-                  onChange={() => setMigrationOption('deleteAll')}
-                  className="text-primary-main"
-                />
-                <span className="text-sm text-red-600">Delete all cards in this column</span>
+                <input type="radio" name="migration" checked={migrationOption === 'deleteAll'} onChange={() => setMigrationOption('deleteAll')} className="text-[#6366F1]" />
+                <span className="text-sm text-red-600">{t('board.deleteAllCards')}</span>
               </label>
             </div>
           )}
 
           <div className="flex gap-2 justify-end pt-4 border-t border-[var(--color-border)]">
             <Button variant="secondary" onClick={() => setDeleteColumnId(null)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="danger"
               onClick={handleDeleteColumnConfirm}
               disabled={migrationOption === 'moveToColumn' && !migrationTargetId}
             >
-              Delete Column
+              {t('board.deleteColumnTitle')}
             </Button>
           </div>
         </div>

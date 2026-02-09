@@ -21,14 +21,15 @@
     "holiday": "Festivo",
     "nonWorkDay": "Dia no laborable",
     "less": "Menos",
-    "more": "Mas"
+    "more": "mas",
+    "backToCalendar": "Volver al Calendario"
   },
   "calendar": {
     "loadingHolidays": "Cargando festivos...",
     "tasks": "tareas"
   },
   "board": {
-    "totalTasks": "tareas en total",
+    "tasksTotal": "tareas en total",
     "completed": "completadas",
     "addColumn": "Agregar Columna",
     "addCard": "+ Agregar Tarjeta",
@@ -45,7 +46,11 @@
     "deleteAllCards": "Eliminar todas las tarjetas de esta columna",
     "selectColumn": "Seleccionar columna...",
     "columnName": "Nombre de Columna",
-    "createColumn": "Crear Columna"
+    "columnNamePlaceholder": "Ingresa el nombre de la columna...",
+    "createColumn": "Crear Columna",
+    "renameTooltip": "Doble clic para renombrar",
+    "addCardTooltip": "Agregar tarjeta",
+    "deleteColumnTooltip": "Eliminar columna"
   },
   "card": {
     "newCard": "Nueva Tarjeta",
@@ -109,6 +114,7 @@
     "general": "General",
     "workDays": "Dias Laborables",
     "templates": "Plantillas",
+    "tags": "Etiquetas",
     "holidays": "Dias Festivos",
     "appearance": "Apariencia",
     "dataManagement": "Gestion de Datos"

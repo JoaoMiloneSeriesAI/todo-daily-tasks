@@ -1,8 +1,7 @@
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { CalendarDay as CalendarDayType } from '../../types/calendar';
 import { format, isSameMonth } from 'date-fns';
-import { Badge } from '../shared';
 
 interface CalendarDayProps {
   day: CalendarDayType;
@@ -12,73 +11,100 @@ interface CalendarDayProps {
 }
 
 export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClick, isSelected }: CalendarDayProps) {
+  const { t } = useTranslation();
   const isCurrentMonth = isSameMonth(day.date, currentMonth);
   const dayNumber = format(day.date, 'd');
 
+  const bgClass = (() => {
+    if (isSelected) return 'bg-[#6366F1]/10';
+    if (day.isToday) return 'bg-[#6366F1]/10';
+    if (day.isHoliday) return 'bg-red-50 dark:bg-red-900/20';
+    if (!day.isWorkDay) return 'bg-[var(--color-bg-tertiary)]';
+    return 'bg-[var(--color-surface)]';
+  })();
+
   return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+    <div
       onClick={() => onClick(day.date)}
       className={`
-        relative min-h-[100px] p-3 rounded-lg cursor-pointer
-        border-2 transition-all duration-200
-        ${isSelected ? 'border-primary-main bg-primary-main/10' : 'border-[var(--color-border)] hover:border-primary-light'}
+        relative min-h-[90px] p-2 rounded-lg cursor-pointer
+        border transition-all duration-150 flex flex-col
+        hover:-translate-y-0.5 hover:shadow-md
+        ${isSelected ? 'border-[#6366F1] border-2' : 'border-[var(--color-border)] hover:border-[#818CF8]'}
         ${!isCurrentMonth ? 'opacity-40' : ''}
-        ${day.isToday ? 'ring-2 ring-primary-main' : ''}
-        ${day.isHoliday ? 'bg-red-50 dark:bg-red-900/20' : 'bg-[var(--color-surface)]'}
-        ${!day.isWorkDay && !day.isHoliday ? 'bg-[var(--color-bg-tertiary)]' : ''}
+        ${day.isToday ? 'ring-2 ring-[#6366F1] ring-offset-1' : ''}
+        ${bgClass}
       `}
     >
       {/* Day number */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-0.5">
         <span
           className={`
-            text-sm font-semibold
-            ${day.isToday ? 'text-primary-main' : 'text-[var(--color-text-primary)]'}
+            text-xs leading-none
+            ${day.isToday
+              ? 'font-bold text-white bg-[#6366F1] w-6 h-6 rounded-full flex items-center justify-center'
+              : 'font-semibold text-[var(--color-text-primary)]'
+            }
           `}
         >
           {dayNumber}
         </span>
-
-        {/* Indicators */}
-        <div className="flex items-center gap-1">
-          {day.isToday && (
-            <div className="w-2 h-2 bg-primary-main rounded-full" />
-          )}
-        </div>
       </div>
 
-      {/* Holiday name */}
-      {day.isHoliday && day.holidayName && (
-        <div className="mb-2">
-          <Badge variant="error" size="sm">
-            {day.holidayName}
-          </Badge>
-        </div>
-      )}
+      {/* Content area — fills remaining space, truncates overflow */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        {/* Holiday names — compact, max 2 visible */}
+        {day.isHoliday && day.holidayNames && day.holidayNames.length > 0 && (
+          <div className="mb-0.5">
+            {day.holidayNames.slice(0, 2).map((name, i) => (
+              <div
+                key={i}
+                className="text-[9px] leading-tight font-medium text-red-600 dark:text-red-400 truncate"
+              >
+                {name}
+              </div>
+            ))}
+            {day.holidayNames.length > 2 && (
+              <div className="text-[8px] text-red-400">+{day.holidayNames.length - 2}</div>
+            )}
+          </div>
+        )}
 
-      {/* Task count */}
+        {/* Card title previews */}
+        {day.cardTitles && day.cardTitles.length > 0 && (
+          <div className="space-y-px">
+            {day.cardTitles.slice(0, 2).map((title, i) => (
+              <div key={i} className="text-[9px] leading-tight text-[var(--color-text-secondary)] truncate">
+                {title}
+              </div>
+            ))}
+            {day.cardTitles.length > 2 && (
+              <div className="text-[8px] text-[var(--color-text-tertiary)]">
+                +{day.cardTitles.length - 2} {t('common.more').toLowerCase()}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Task progress bar — pinned to bottom */}
       {day.taskCount > 0 && (
-        <div className="mt-auto">
-          <div className="text-xs text-[var(--color-text-secondary)]">
-            <span className="font-medium">{day.completedCount}</span>
-            <span className="text-[var(--color-text-tertiary)]"> / </span>
-            <span className="font-medium">{day.taskCount}</span>
-            <span className="text-[var(--color-text-tertiary)]"> tasks</span>
-          </div>
-
-          {/* Progress bar */}
-          <div className="mt-1 w-full h-1 bg-[var(--color-bg-tertiary)] rounded-full overflow-hidden">
-            <div
-              className="h-full bg-green-500 transition-all duration-300"
-              style={{
-                width: `${day.taskCount > 0 ? (day.completedCount / day.taskCount) * 100 : 0}%`,
-              }}
-            />
+        <div className="mt-auto pt-0.5">
+          <div className="flex items-center gap-1">
+            <div className="flex-1 h-1 bg-[var(--color-bg-tertiary)] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-green-500 transition-all duration-300"
+                style={{
+                  width: `${(day.completedCount / day.taskCount) * 100}%`,
+                }}
+              />
+            </div>
+            <span className="text-[8px] text-[var(--color-text-tertiary)] tabular-nums">
+              {day.completedCount}/{day.taskCount}
+            </span>
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 });
