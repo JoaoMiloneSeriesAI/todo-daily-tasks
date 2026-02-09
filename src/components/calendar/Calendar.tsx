@@ -42,7 +42,7 @@ export function Calendar({ onDayClick }: CalendarProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
+    <div className="bg-[var(--color-surface)] rounded-xl shadow-sm p-6">
       <CalendarHeader
         currentMonth={currentMonth}
         onPreviousMonth={goToPreviousMonth}
@@ -52,7 +52,7 @@ export function Calendar({ onDayClick }: CalendarProps) {
 
       {isLoadingHolidays && (
         <div className="mb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
             <LoadingSpinner size="sm" />
             <span>Loading holidays...</span>
           </div>
@@ -64,7 +64,7 @@ export function Calendar({ onDayClick }: CalendarProps) {
         {weekDays.map((day) => (
           <div
             key={day}
-            className="text-center text-sm font-semibold text-gray-600 py-2"
+            className="text-center text-sm font-semibold text-[var(--color-text-secondary)] py-2"
           >
             {day}
           </div>
@@ -85,7 +85,7 @@ export function Calendar({ onDayClick }: CalendarProps) {
       </div>
 
       {/* Legend */}
-      <div className="mt-6 flex items-center gap-4 text-sm text-gray-600">
+      <div className="mt-6 flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-primary-main" />
           <span>Selected</span>
@@ -95,11 +95,11 @@ export function Calendar({ onDayClick }: CalendarProps) {
           <span>Today</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-red-50 border-2 border-gray-200" />
+          <div className="w-4 h-4 rounded bg-red-50 dark:bg-red-900/20 border-2 border-[var(--color-border)]" />
           <span>Holiday</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gray-50 border-2 border-gray-200" />
+          <div className="w-4 h-4 rounded bg-[var(--color-bg-tertiary)] border-2 border-[var(--color-border)]" />
           <span>Non-work day</span>
         </div>
       </div>

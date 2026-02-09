@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { AppSettings, DEFAULT_SETTINGS, CustomHoliday } from '../types/settings';
 import { CardTemplate } from '../types/card';
+import { ipcService } from '../services/ipcService';
 
 interface SettingsStore {
   settings: AppSettings;
@@ -55,7 +56,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     set({ isLoading: true });
 
     try {
-      const loadedSettings = await window.electronAPI.getSettings();
+      const loadedSettings = await ipcService.getSettings();
 
       if (loadedSettings && typeof loadedSettings === 'object') {
         set({ settings: loadedSettings as AppSettings });
@@ -84,7 +85,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     set({ settings: updatedSettings });
 
     try {
-      await window.electronAPI.updateSettings(updatedSettings);
+      await ipcService.updateSettings(updatedSettings);
     } catch (error) {
       console.error('Error updating settings:', error);
       // Rollback on error
@@ -96,7 +97,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     set({ settings: DEFAULT_SETTINGS });
 
     try {
-      await window.electronAPI.updateSettings(DEFAULT_SETTINGS);
+      await ipcService.updateSettings(DEFAULT_SETTINGS);
     } catch (error) {
       console.error('Error resetting settings:', error);
     }

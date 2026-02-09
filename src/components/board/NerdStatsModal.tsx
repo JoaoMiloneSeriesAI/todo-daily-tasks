@@ -18,34 +18,34 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
   const movements = TimeTracker.getMovementHistory(card);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="📊 Nerd Stats" size="xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="Nerd Stats" size="xl">
       <div className="space-y-6">
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Total Time */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-blue-600 mb-2">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2">
               <Clock size={20} />
               <span className="text-sm font-medium">Total Time</span>
             </div>
-            <p className="text-2xl font-bold text-blue-900">
+            <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
               {timeData.totalTimeFormatted}
             </p>
-            <p className="text-xs text-blue-600 mt-1">
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
               Since creation
             </p>
           </div>
 
           {/* Current Column */}
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-purple-600 mb-2">
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-2">
               <Activity size={20} />
               <span className="text-sm font-medium">Current Column</span>
             </div>
-            <p className="text-2xl font-bold text-purple-900">
+            <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
               {timeData.timeInCurrentColumnFormatted}
             </p>
-            <p className="text-xs text-purple-600 mt-1">
+            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
               In {columns.find((c) => c.id === card.columnId)?.name || 'Unknown'}
             </p>
           </div>
@@ -53,22 +53,22 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
           {/* Status */}
           <div className={`bg-gradient-to-br ${
             timeData.isCompleted
-              ? 'from-green-50 to-green-100'
-              : 'from-orange-50 to-orange-100'
+              ? 'from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20'
+              : 'from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/20'
           } rounded-lg p-4`}>
             <div className={`flex items-center gap-2 ${
-              timeData.isCompleted ? 'text-green-600' : 'text-orange-600'
+              timeData.isCompleted ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'
             } mb-2`}>
               <TrendingUp size={20} />
               <span className="text-sm font-medium">Status</span>
             </div>
             <p className={`text-2xl font-bold ${
-              timeData.isCompleted ? 'text-green-900' : 'text-orange-900'
+              timeData.isCompleted ? 'text-green-900 dark:text-green-100' : 'text-orange-900 dark:text-orange-100'
             }`}>
               {timeData.isCompleted ? 'Completed' : 'In Progress'}
             </p>
             <p className={`text-xs ${
-              timeData.isCompleted ? 'text-green-600' : 'text-orange-600'
+              timeData.isCompleted ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'
             } mt-1`}>
               {timeData.currentColumnPercentage}% of total time
             </p>
@@ -77,21 +77,21 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
 
         {/* Time Breakdown */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
             Time Breakdown by Column
           </h3>
           <div className="space-y-3">
             {timeData.breakdown.map((item) => (
               <div key={item.columnId} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-[var(--color-text-primary)]">
                     {item.columnName}
                   </span>
-                  <span className="text-gray-600">
+                  <span className="text-[var(--color-text-secondary)]">
                     {TimeTracker.formatDuration(item.timeSpent)} ({item.percentage.toFixed(1)}%)
                   </span>
                 </div>
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[var(--color-bg-tertiary)] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-primary-main to-primary-light transition-all duration-500"
                     style={{ width: `${item.percentage}%` }}
@@ -104,12 +104,12 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
 
         {/* Movement History Timeline */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
             Movement History
           </h3>
           <div className="space-y-3 max-h-64 overflow-y-auto">
             {movements.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center py-4">
+              <p className="text-sm text-[var(--color-text-tertiary)] text-center py-4">
                 No movements yet
               </p>
             ) : (
@@ -124,10 +124,10 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
                       <div className={`w-3 h-3 rounded-full ${
                         index === movements.length - 1
                           ? 'bg-primary-main'
-                          : 'bg-gray-300'
+                          : 'bg-[var(--color-border)]'
                       }`} />
                       {index < movements.length - 1 && (
-                        <div className="w-0.5 h-8 bg-gray-300" />
+                        <div className="w-0.5 h-8 bg-[var(--color-border)]" />
                       )}
                     </div>
 
@@ -136,27 +136,27 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
                       <div className="flex items-center gap-2 text-sm">
                         {movement.fromColumnId ? (
                           <>
-                            <span className="font-medium text-gray-600">
+                            <span className="font-medium text-[var(--color-text-secondary)]">
                               {fromColumn?.name || 'Unknown'}
                             </span>
-                            <span className="text-gray-400">→</span>
-                            <span className="font-medium text-gray-900">
+                            <span className="text-[var(--color-text-tertiary)]">&rarr;</span>
+                            <span className="font-medium text-[var(--color-text-primary)]">
                               {toColumn?.name || 'Unknown'}
                             </span>
                           </>
                         ) : (
                           <>
-                            <span className="text-gray-500">Created in</span>
-                            <span className="font-medium text-gray-900">
+                            <span className="text-[var(--color-text-secondary)]">Created in</span>
+                            <span className="font-medium text-[var(--color-text-primary)]">
                               {toColumn?.name || 'Unknown'}
                             </span>
                           </>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                      <div className="flex items-center gap-1 text-xs text-[var(--color-text-tertiary)] mt-1">
                         <Calendar size={12} />
                         <span>
-                          {format(new Date(movement.timestamp), 'MMM d, yyyy • h:mm a')}
+                          {format(new Date(movement.timestamp), 'MMM d, yyyy h:mm a')}
                         </span>
                       </div>
                     </div>
@@ -168,24 +168,24 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
         </div>
 
         {/* Card Metadata */}
-        <div className="pt-4 border-t border-gray-200">
+        <div className="pt-4 border-t border-[var(--color-border)]">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Created:</span>
-              <span className="ml-2 font-medium text-gray-900">
-                {format(new Date(card.createdDate), 'MMM d, yyyy • h:mm a')}
+              <span className="text-[var(--color-text-secondary)]">Created:</span>
+              <span className="ml-2 font-medium text-[var(--color-text-primary)]">
+                {format(new Date(card.createdDate), 'MMM d, yyyy h:mm a')}
               </span>
             </div>
             {timeData.isCompleted && (
               <div>
-                <span className="text-gray-600">Completed:</span>
-                <span className="ml-2 font-medium text-gray-900">
+                <span className="text-[var(--color-text-secondary)]">Completed:</span>
+                <span className="ml-2 font-medium text-[var(--color-text-primary)]">
                   {movements.find((m) => m.toColumnId === 'done')
                     ? format(
                         new Date(
                           movements.find((m) => m.toColumnId === 'done')!.timestamp
                         ),
-                        'MMM d, yyyy • h:mm a'
+                        'MMM d, yyyy h:mm a'
                       )
                     : 'N/A'}
                 </span>

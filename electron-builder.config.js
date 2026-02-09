@@ -6,7 +6,7 @@ module.exports = {
   appId: 'com.taskmanager.app',
   productName: 'Task Manager',
   directories: {
-    output: 'release',
+    output: 'Builds',
     buildResources: 'resources',
   },
   files: [
@@ -54,7 +54,7 @@ module.exports = {
     target: [
       {
         target: 'nsis',
-        arch: ['x64', 'arm64'],
+        arch: ['x64'],
       },
       {
         target: 'portable',

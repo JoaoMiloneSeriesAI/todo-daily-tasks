@@ -1,9 +1,10 @@
+import { useState, memo } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Column as ColumnType } from '../../types/column';
 import { Card as CardType } from '../../types/card';
 import { Card } from './Card';
-import { Plus, MoreVertical } from 'lucide-react';
+import { Plus, Trash2, Check, X } from 'lucide-react';
 import { Badge } from '../shared';
 
 interface ColumnProps {
@@ -14,11 +15,12 @@ interface ColumnProps {
   onDeleteCard: (cardId: string) => void;
   onDuplicateCard: (cardId: string) => void;
   onViewStats: (card: CardType) => void;
-  onEditColumn?: () => void;
+  onRenameColumn?: (name: string) => void;
   onDeleteColumn?: () => void;
+  onMoveCardToNextDay?: (cardId: string) => void;
 }
 
-export function Column({
+export const Column = memo(function Column({
   column,
   cards,
   onAddCard,
@@ -26,18 +28,69 @@ export function Column({
   onDeleteCard,
   onDuplicateCard,
   onViewStats,
-  onEditColumn,
+  onRenameColumn,
+  onDeleteColumn,
+  onMoveCardToNextDay,
 }: ColumnProps) {
   const { setNodeRef } = useDroppable({
     id: column.id,
   });
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(column.name);
+
+  const handleDoubleClick = () => {
+    if (column.isStatic || !onRenameColumn) return;
+    setEditName(column.name);
+    setIsEditing(true);
+  };
+
+  const handleSaveRename = () => {
+    if (editName.trim() && onRenameColumn) {
+      onRenameColumn(editName.trim());
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancelRename = () => {
+    setEditName(column.name);
+    setIsEditing(false);
+  };
+
   return (
-    <div className="flex flex-col w-80 bg-background-tertiary rounded-lg p-4 h-full">
+    <div className="flex flex-col w-80 bg-[var(--color-bg-tertiary)] rounded-lg p-4 h-full">
       {/* Column Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-sm text-gray-800">{column.name}</h3>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {isEditing ? (
+            <div className="flex items-center gap-1 flex-1">
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveRename();
+                  if (e.key === 'Escape') handleCancelRename();
+                }}
+                autoFocus
+                className="flex-1 px-2 py-1 text-sm font-semibold bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded text-[var(--color-text-primary)]"
+              />
+              <button onClick={handleSaveRename} className="p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded transition-colors">
+                <Check size={14} className="text-green-600" />
+              </button>
+              <button onClick={handleCancelRename} className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors">
+                <X size={14} className="text-red-600" />
+              </button>
+            </div>
+          ) : (
+            <h3
+              className={`font-semibold text-sm text-[var(--color-text-primary)] truncate ${!column.isStatic ? 'cursor-pointer' : ''}`}
+              onDoubleClick={handleDoubleClick}
+              title={!column.isStatic ? 'Double-click to rename' : undefined}
+            >
+              {column.name}
+            </h3>
+          )}
           <Badge variant="default" size="sm">
             {cards.length}
           </Badge>
@@ -46,19 +99,19 @@ export function Column({
         <div className="flex items-center gap-1">
           <button
             onClick={onAddCard}
-            className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+            className="p-1.5 hover:bg-[var(--color-surface-active)] rounded transition-colors"
             title="Add card"
           >
-            <Plus size={16} className="text-gray-600" />
+            <Plus size={16} className="text-[var(--color-text-secondary)]" />
           </button>
 
-          {!column.isStatic && (
+          {!column.isStatic && onDeleteColumn && (
             <button
-              onClick={onEditColumn}
-              className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-              title="Column options"
+              onClick={onDeleteColumn}
+              className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
+              title="Delete column"
             >
-              <MoreVertical size={16} className="text-gray-600" />
+              <Trash2 size={16} className="text-[var(--color-text-secondary)] hover:text-red-600" />
             </button>
           )}
         </div>
@@ -81,12 +134,13 @@ export function Column({
               onDelete={onDeleteCard}
               onDuplicate={onDuplicateCard}
               onViewStats={onViewStats}
+              onMoveToNextDay={onMoveCardToNextDay ? () => onMoveCardToNextDay(card.id) : undefined}
             />
           ))}
         </SortableContext>
 
         {cards.length === 0 && (
-          <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
+          <div className="flex items-center justify-center h-32 text-[var(--color-text-tertiary)] text-sm">
             No cards yet
           </div>
         )}
@@ -95,10 +149,10 @@ export function Column({
       {/* Add Card Button */}
       <button
         onClick={onAddCard}
-        className="mt-4 w-full py-2 px-4 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-200 transition-colors"
+        className="mt-4 w-full py-2 px-4 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] text-sm font-medium rounded-lg border border-[var(--color-border)] transition-colors"
       >
         + Add Card
       </button>
     </div>
   );
-}
+});

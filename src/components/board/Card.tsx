@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card as CardType } from '../../types/card';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { MoreVertical, CheckSquare, BarChart2, Edit, Trash2, Copy } from 'lucide-react';
+import { MoreVertical, CheckSquare, BarChart2, Edit, Trash2, Copy, ArrowRightCircle } from 'lucide-react';
 import { Badge } from '../shared';
 
 interface CardProps {
@@ -13,9 +13,10 @@ interface CardProps {
   onDelete: (cardId: string) => void;
   onDuplicate: (cardId: string) => void;
   onViewStats: (card: CardType) => void;
+  onMoveToNextDay?: () => void;
 }
 
-export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardProps) {
+export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, onViewStats, onMoveToNextDay }: CardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const {
     attributes,
@@ -46,8 +47,8 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={`
-        bg-white rounded-lg p-4 shadow-sm hover:shadow-md
-        border border-gray-200
+        bg-[var(--color-surface)] rounded-lg p-4 shadow-sm hover:shadow-md
+        border border-[var(--color-border)]
         transition-shadow cursor-grab active:cursor-grabbing
         ${isDragging ? 'opacity-50' : 'opacity-100'}
       `}
@@ -56,7 +57,7 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
       <div className="flex items-start justify-between mb-2">
         <h3
           className="font-semibold text-sm flex-1"
-          style={{ color: template?.color || '#1F2937' }}
+          style={{ color: template?.color || 'var(--color-text-primary)' }}
         >
           {template?.prefix}
           {card.title}
@@ -68,9 +69,9 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
               e.stopPropagation();
               setShowMenu(!showMenu);
             }}
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-[var(--color-surface-hover)] rounded transition-colors"
           >
-            <MoreVertical size={16} className="text-gray-500" />
+            <MoreVertical size={16} className="text-[var(--color-text-secondary)]" />
           </button>
 
           {/* Dropdown Menu */}
@@ -92,7 +93,7 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -10 }}
                   transition={{ duration: 0.1 }}
-                  className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20"
+                  className="absolute right-0 top-8 w-48 bg-[var(--color-surface)] rounded-lg shadow-lg border border-[var(--color-border)] py-1 z-20"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
@@ -101,7 +102,7 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
                       onViewStats(card);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] flex items-center gap-2"
                   >
                     <BarChart2 size={16} />
                     View Stats
@@ -112,7 +113,7 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
                       onEdit(card);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] flex items-center gap-2"
                   >
                     <Edit size={16} />
                     Edit
@@ -123,12 +124,25 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
                       onDuplicate(card.id);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] flex items-center gap-2"
                   >
                     <Copy size={16} />
                     Duplicate
                   </button>
-                  <div className="border-t border-gray-100 my-1" />
+                  {onMoveToNextDay && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMoveToNextDay();
+                        setShowMenu(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] flex items-center gap-2"
+                    >
+                      <ArrowRightCircle size={16} />
+                      Move to Next Day
+                    </button>
+                  )}
+                  <div className="border-t border-[var(--color-border)] my-1" />
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -137,7 +151,7 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
                       }
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
                   >
                     <Trash2 size={16} />
                     Delete
@@ -151,7 +165,7 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
 
       {/* Description */}
       {card.description && (
-        <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+        <p className="text-xs text-[var(--color-text-secondary)] mb-3 line-clamp-2">
           {card.description}
         </p>
       )}
@@ -169,12 +183,12 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
 
       {/* Checklist Progress */}
       {totalItems > 0 && (
-        <div className="flex items-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
           <CheckSquare size={14} />
           <span className="font-medium">
             {completedItems}/{totalItems}
           </span>
-          <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-[var(--color-bg-tertiary)] rounded-full overflow-hidden">
             <div
               className="h-full bg-green-500 transition-all duration-300"
               style={{
@@ -186,4 +200,4 @@ export function Card({ card, onEdit, onDelete, onDuplicate, onViewStats }: CardP
       )}
     </motion.div>
   );
-}
+});

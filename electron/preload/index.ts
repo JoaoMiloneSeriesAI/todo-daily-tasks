@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Data operations
   loadData: (key: string) => ipcRenderer.invoke('load-data', key),
   saveData: (key: string, data: unknown) => ipcRenderer.invoke('save-data', key, data),
+  loadDataRange: (startDate: string, endDate: string) => ipcRenderer.invoke('load-data-range', startDate, endDate),
 
   // Settings
   getSettings: () => ipcRenderer.invoke('get-settings'),

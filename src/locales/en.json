@@ -6,24 +6,85 @@
     "dashboard": "Dashboard",
     "settings": "Settings"
   },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "close": "Close",
+    "create": "Create",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "today": "Today",
+    "selected": "Selected",
+    "holiday": "Holiday",
+    "nonWorkDay": "Non-work day",
+    "less": "Less",
+    "more": "More"
+  },
+  "calendar": {
+    "loadingHolidays": "Loading holidays...",
+    "tasks": "tasks"
+  },
   "board": {
     "totalTasks": "tasks total",
     "completed": "completed",
     "addColumn": "Add Column",
-    "addCard": "Add Card",
-    "taskCompleted": "Task \"{{title}}\" completed!"
+    "addCard": "+ Add Card",
+    "noCards": "No cards yet",
+    "taskCompleted": "Task \"{{title}}\" completed!",
+    "columnCreated": "Column \"{{name}}\" created",
+    "columnDeleted": "Column \"{{name}}\" deleted",
+    "deleteColumnTitle": "Delete Column",
+    "deleteColumnConfirm": "Are you sure you want to delete",
+    "cardsAffected": "{{count}} card(s) will be affected.",
+    "migrationQuestion": "What should happen to the cards?",
+    "moveToTodo": "Move all cards to TODO",
+    "moveToColumn": "Move to another column:",
+    "deleteAllCards": "Delete all cards in this column",
+    "selectColumn": "Select column...",
+    "columnName": "Column Name",
+    "createColumn": "Create Column"
   },
   "card": {
+    "newCard": "New Card",
+    "editCard": "Edit Card",
     "title": "Title",
+    "titlePlaceholder": "Enter card title...",
     "description": "Description",
+    "descriptionPlaceholder": "Add a description...",
+    "template": "Template (Optional)",
+    "noTemplate": "No template",
     "tags": "Tags",
+    "addTag": "Add tag...",
     "checklist": "Checklist",
+    "addChecklistItem": "Add checklist item...",
     "edit": "Edit",
     "delete": "Delete",
     "duplicate": "Duplicate",
     "viewStats": "View Stats",
-    "save": "Save",
-    "cancel": "Cancel"
+    "moveToNextDay": "Move to Next Day",
+    "saveChanges": "Save Changes",
+    "createCard": "Create Card",
+    "deleteConfirm": "Are you sure you want to delete this card?"
+  },
+  "stats": {
+    "nerdStats": "Nerd Stats",
+    "totalTime": "Total Time",
+    "sinceCreation": "Since creation",
+    "currentColumn": "Current Column",
+    "in": "In {{name}}",
+    "status": "Status",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "ofTotalTime": "{{percent}}% of total time",
+    "timeBreakdown": "Time Breakdown by Column",
+    "movementHistory": "Movement History",
+    "noMovements": "No movements yet",
+    "createdIn": "Created in",
+    "created": "Created:",
+    "completedAt": "Completed:"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -32,10 +93,15 @@
     "completedTasks": "Completed",
     "inProgress": "In Progress",
     "avgCompletionTime": "Avg Completion Time",
+    "vsPrevious": "vs previous period",
     "lastSevenDays": "Last 7 Days",
     "lastThirtyDays": "Last 30 Days",
     "thisMonth": "This Month",
-    "lastMonth": "Last Month"
+    "lastMonth": "Last Month",
+    "taskCompletionOverTime": "Task Completion Over Time",
+    "timeSpentByColumn": "Time Spent by Column",
+    "tagDistribution": "Tag Distribution",
+    "dailyProductivity": "Daily Productivity"
   },
   "settings": {
     "title": "Settings",
@@ -46,11 +112,5 @@
     "holidays": "Holidays",
     "appearance": "Appearance",
     "dataManagement": "Data Management"
-  },
-  "toast": {
-    "success": "Success",
-    "error": "Error",
-    "warning": "Warning",
-    "info": "Info"
   }
 }

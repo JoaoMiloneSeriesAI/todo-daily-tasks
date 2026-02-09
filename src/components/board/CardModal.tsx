@@ -108,14 +108,14 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
             Description
           </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description..."
-            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:bg-white focus:border-primary-main focus:ring-2 focus:ring-primary-main focus:ring-opacity-20 transition-all duration-200"
+            className="w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-primary-main focus:ring-2 focus:ring-primary-main focus:ring-opacity-20 transition-all duration-200"
             rows={3}
           />
         </div>
@@ -133,7 +133,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
 
         {/* Tags */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Tags</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
@@ -141,7 +141,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
               onChange={(e) => setTagInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
               placeholder="Add tag..."
-              className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+              className="flex-1 px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm"
             />
             <Button variant="secondary" size="sm" onClick={handleAddTag}>
               <Plus size={16} />
@@ -151,7 +151,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
+                className="inline-flex items-center gap-1 px-3 py-1 bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] text-sm rounded-full"
               >
                 {tag}
                 <button
@@ -167,7 +167,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
 
         {/* Checklist */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Checklist</label>
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Checklist</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
@@ -175,7 +175,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
               onChange={(e) => setChecklistInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleAddChecklistItem()}
               placeholder="Add checklist item..."
-              className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+              className="flex-1 px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm"
             />
             <Button variant="secondary" size="sm" onClick={handleAddChecklistItem}>
               <Plus size={16} />
@@ -183,7 +183,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
           </div>
           <div className="space-y-2">
             {checklist.map((item) => (
-              <div key={item.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+              <div key={item.id} className="flex items-center gap-2 p-2 bg-[var(--color-bg-tertiary)] rounded-lg">
                 <input
                   type="checkbox"
                   checked={item.isCompleted}
@@ -192,14 +192,14 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
                 />
                 <span
                   className={`flex-1 text-sm ${
-                    item.isCompleted ? 'line-through text-gray-500' : 'text-gray-700'
+                    item.isCompleted ? 'line-through text-[var(--color-text-tertiary)]' : 'text-[var(--color-text-primary)]'
                   }`}
                 >
                   {item.text}
                 </span>
                 <button
                   onClick={() => handleRemoveChecklistItem(item.id)}
-                  className="p-1 hover:bg-red-50 hover:text-red-500 rounded transition-colors"
+                  className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 rounded transition-colors"
                 >
                   <Trash2 size={14} />
                 </button>
@@ -209,7 +209,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId }: CardModal
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 justify-end pt-4 border-t">
+        <div className="flex gap-2 justify-end pt-4 border-t border-[var(--color-border)]">
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>

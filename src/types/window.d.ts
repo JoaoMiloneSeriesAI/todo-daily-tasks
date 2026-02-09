@@ -6,6 +6,7 @@ export interface ElectronAPI {
   // Data operations
   loadData: (key: string) => Promise<BoardData | null>;
   saveData: (key: string, data: BoardData) => Promise<void>;
+  loadDataRange: (startDate: string, endDate: string) => Promise<Record<string, BoardData>>;
 
   // Settings
   getSettings: () => Promise<AppSettings>;

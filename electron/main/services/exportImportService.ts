@@ -1,6 +1,7 @@
 import { dialog, app } from 'electron';
 import fs from 'fs-extra';
 import path from 'path';
+import log from 'electron-log';
 
 interface ExportData {
   version: string;
@@ -37,10 +38,10 @@ export class ExportImportService {
 
       await fs.writeJson(filePath, exportData, { spaces: 2 });
 
-      console.log('Data exported successfully to:', filePath);
+      log.info('Data exported successfully to:', filePath);
       return { success: true, path: filePath };
     } catch (error) {
-      console.error('Export error:', error);
+      log.error('Export error:', error);
       return { success: false };
     }
   }
@@ -68,10 +69,10 @@ export class ExportImportService {
         throw new Error('Invalid data format - not a valid Task Manager backup file');
       }
 
-      console.log('Data imported successfully from:', filePaths[0]);
+      log.info('Data imported successfully from:', filePaths[0]);
       return { success: true, data: fileContent.data };
     } catch (error) {
-      console.error('Import error:', error);
+      log.error('Import error:', error);
       return { success: false };
     }
   }
@@ -83,11 +84,40 @@ export class ExportImportService {
 
     const exportData = data as Partial<ExportData>;
 
-    return !!(
-      exportData.version &&
-      exportData.exportDate &&
-      exportData.data &&
-      typeof exportData.data === 'object'
-    );
+    // Basic structure checks
+    if (!exportData.version || !exportData.exportDate || !exportData.data || typeof exportData.data !== 'object') {
+      return false;
+    }
+
+    // Validate version format
+    if (typeof exportData.version !== 'string') {
+      return false;
+    }
+
+    // Validate export date is a valid ISO date
+    if (typeof exportData.exportDate !== 'string' || isNaN(Date.parse(exportData.exportDate))) {
+      return false;
+    }
+
+    // If data contains boards, validate they are keyed by date strings
+    const appData = exportData.data as Record<string, unknown>;
+    if (appData.boards && typeof appData.boards === 'object') {
+      const boards = appData.boards as Record<string, unknown>;
+      for (const [key, board] of Object.entries(boards)) {
+        // Date key should match YYYY-MM-DD format
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+          log.warn('Invalid board date key during import validation:', key);
+          return false;
+        }
+
+        // Board should be an object with expected shape
+        if (!board || typeof board !== 'object') {
+          log.warn('Invalid board data during import validation for key:', key);
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 }

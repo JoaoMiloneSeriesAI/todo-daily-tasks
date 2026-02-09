@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarDay as CalendarDayType } from '../../types/calendar';
 import { format, isSameMonth } from 'date-fns';
@@ -10,7 +11,7 @@ interface CalendarDayProps {
   isSelected: boolean;
 }
 
-export function CalendarDay({ day, currentMonth, onClick, isSelected }: CalendarDayProps) {
+export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClick, isSelected }: CalendarDayProps) {
   const isCurrentMonth = isSameMonth(day.date, currentMonth);
   const dayNumber = format(day.date, 'd');
 
@@ -22,11 +23,11 @@ export function CalendarDay({ day, currentMonth, onClick, isSelected }: Calendar
       className={`
         relative min-h-[100px] p-3 rounded-lg cursor-pointer
         border-2 transition-all duration-200
-        ${isSelected ? 'border-primary-main bg-primary-main bg-opacity-10' : 'border-gray-200 hover:border-primary-light'}
+        ${isSelected ? 'border-primary-main bg-primary-main/10' : 'border-[var(--color-border)] hover:border-primary-light'}
         ${!isCurrentMonth ? 'opacity-40' : ''}
         ${day.isToday ? 'ring-2 ring-primary-main' : ''}
-        ${day.isHoliday ? 'bg-red-50' : 'bg-white'}
-        ${!day.isWorkDay ? 'bg-gray-50' : ''}
+        ${day.isHoliday ? 'bg-red-50 dark:bg-red-900/20' : 'bg-[var(--color-surface)]'}
+        ${!day.isWorkDay && !day.isHoliday ? 'bg-[var(--color-bg-tertiary)]' : ''}
       `}
     >
       {/* Day number */}
@@ -34,7 +35,7 @@ export function CalendarDay({ day, currentMonth, onClick, isSelected }: Calendar
         <span
           className={`
             text-sm font-semibold
-            ${day.isToday ? 'text-primary-main' : 'text-gray-700'}
+            ${day.isToday ? 'text-primary-main' : 'text-[var(--color-text-primary)]'}
           `}
         >
           {dayNumber}
@@ -60,15 +61,15 @@ export function CalendarDay({ day, currentMonth, onClick, isSelected }: Calendar
       {/* Task count */}
       {day.taskCount > 0 && (
         <div className="mt-auto">
-          <div className="text-xs text-gray-600">
+          <div className="text-xs text-[var(--color-text-secondary)]">
             <span className="font-medium">{day.completedCount}</span>
-            <span className="text-gray-400"> / </span>
+            <span className="text-[var(--color-text-tertiary)]"> / </span>
             <span className="font-medium">{day.taskCount}</span>
-            <span className="text-gray-400"> tasks</span>
+            <span className="text-[var(--color-text-tertiary)]"> tasks</span>
           </div>
 
           {/* Progress bar */}
-          <div className="mt-1 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+          <div className="mt-1 w-full h-1 bg-[var(--color-bg-tertiary)] rounded-full overflow-hidden">
             <div
               className="h-full bg-green-500 transition-all duration-300"
               style={{
@@ -80,4 +81,4 @@ export function CalendarDay({ day, currentMonth, onClick, isSelected }: Calendar
       )}
     </motion.div>
   );
-}
+});

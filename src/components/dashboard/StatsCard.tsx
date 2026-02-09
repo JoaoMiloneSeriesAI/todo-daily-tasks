@@ -15,15 +15,15 @@ export function StatsCard({ title, value, icon, trend, trendLabel }: StatsCardPr
   const isNegative = hasTrend && trend < 0;
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+    <div className="bg-[var(--color-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]">
       <div className="flex items-center justify-between mb-4">
-        <div className="p-3 bg-primary-main bg-opacity-10 rounded-lg text-primary-main">
+        <div className="p-3 bg-primary-main/10 rounded-lg text-primary-main">
           {icon}
         </div>
         {hasTrend && (
           <div
             className={`flex items-center gap-1 text-sm font-semibold ${
-              isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'
+              isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-[var(--color-text-secondary)]'
             }`}
           >
             {isPositive && <TrendingUp size={16} />}
@@ -34,9 +34,9 @@ export function StatsCard({ title, value, icon, trend, trendLabel }: StatsCardPr
       </div>
 
       <div>
-        <p className="text-sm text-gray-600 mb-1">{title}</p>
-        <p className="text-3xl font-bold text-gray-900">{value}</p>
-        {trendLabel && <p className="text-xs text-gray-500 mt-1">{trendLabel}</p>}
+        <p className="text-sm text-[var(--color-text-secondary)] mb-1">{title}</p>
+        <p className="text-3xl font-bold text-[var(--color-text-primary)]">{value}</p>
+        {trendLabel && <p className="text-xs text-[var(--color-text-tertiary)] mt-1">{trendLabel}</p>}
       </div>
     </div>
   );

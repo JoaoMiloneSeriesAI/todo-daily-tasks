@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { DateRange, DashboardStats } from '../types/board';
+import { DateRange, DashboardStats, BoardData } from '../types/board';
 import { Card } from '../types/card';
 import { format, eachDayOfInterval } from 'date-fns';
 import { TimeTracker } from '../utils/timeTracking';
+import { COLUMN_IDS } from '../types/column';
+import { ipcService } from '../services/ipcService';
 
 export function useStats(dateRange: DateRange): DashboardStats {
   const [stats, setStats] = useState<DashboardStats>({
@@ -22,75 +24,146 @@ export function useStats(dateRange: DateRange): DashboardStats {
   }, [dateRange]);
 
   const calculateStats = async () => {
-    // For now, return mock data since we need to aggregate across multiple dates
-    // In a real implementation, we'd load all boards in the date range
+    try {
+      const startKey = format(dateRange.start, 'yyyy-MM-dd');
+      const endKey = format(dateRange.end, 'yyyy-MM-dd');
 
-    const mockCards: Card[] = []; // Would load from electron-store for all dates in range
+      // Load all boards in date range via IPC
+      const boards: Record<string, BoardData> = await ipcService.loadBoardsInRange(startKey, endKey);
 
-    const totalTasks = mockCards.length;
-    const completedTasks = mockCards.filter((c) => c.columnId === 'done').length;
-    const inProgressTasks = mockCards.filter((c) => c.columnId === 'doing').length;
+      // Flatten all cards from all boards
+      const allCards: Card[] = [];
+      const cardsByDate: Record<string, Card[]> = {};
 
-    // Calculate average completion time
-    const completedCardsWithTime = mockCards
-      .filter((c) => c.columnId === 'done')
-      .map((c) => TimeTracker.getTotalTimeToCompletion(c))
-      .filter((t): t is number => t !== null);
+      for (const [dateKey, board] of Object.entries(boards)) {
+        const boardCards = (board as any)?._cards || [];
+        allCards.push(...boardCards);
+        cardsByDate[dateKey] = boardCards;
+      }
 
-    const avgCompletionTime =
-      completedCardsWithTime.length > 0
-        ? completedCardsWithTime.reduce((sum, time) => sum + time, 0) /
-          completedCardsWithTime.length
-        : 0;
+      const totalTasks = allCards.length;
+      const completedTasks = allCards.filter((c) => c.columnId === COLUMN_IDS.DONE).length;
+      const inProgressTasks = allCards.filter((c) => c.columnId === COLUMN_IDS.DOING).length;
 
-    // Generate completion data for chart
-    const days = eachDayOfInterval({ start: dateRange.start, end: dateRange.end });
-    const completionData = days.map((day) => ({
-      date: format(day, 'MMM d'),
-      completed: Math.floor(Math.random() * 10), // Mock data
-    }));
+      // Calculate average completion time from real movement history
+      const completedCardsWithTime = allCards
+        .filter((c) => c.columnId === COLUMN_IDS.DONE)
+        .map((c) => TimeTracker.getTotalTimeToCompletion(c))
+        .filter((t): t is number => t !== null && t > 0);
 
-    // Time by column
-    const timeByColumn = [
-      { columnName: 'TODO', time: 2 * 60 * 60 * 1000, color: '#6366F1' },
-      { columnName: 'Doing', time: 4 * 60 * 60 * 1000, color: '#EC4899' },
-      { columnName: 'Done', time: 1 * 60 * 60 * 1000, color: '#10B981' },
-    ];
+      const avgCompletionTime =
+        completedCardsWithTime.length > 0
+          ? completedCardsWithTime.reduce((sum, time) => sum + time, 0) /
+            completedCardsWithTime.length
+          : 0;
 
-    // Tag distribution
-    const tagCounts: Record<string, number> = {};
-    mockCards.forEach((card) => {
-      card.tags.forEach((tag) => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      // Generate completion data for chart (real counts per day)
+      const days = eachDayOfInterval({ start: dateRange.start, end: dateRange.end });
+      const completionData = days.map((day) => {
+        const dayKey = format(day, 'yyyy-MM-dd');
+        const dayCards = cardsByDate[dayKey] || [];
+        const completed = dayCards.filter((c) => c.columnId === COLUMN_IDS.DONE).length;
+        return {
+          date: format(day, 'MMM d'),
+          completed,
+        };
       });
-    });
 
-    const tagDistribution = Object.entries(tagCounts)
-      .map(([tag, count]) => ({
-        tag,
-        count,
-        percentage: (count / totalTasks) * 100,
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+      // Time by column — aggregate time across all completed cards
+      const columnTimeMap: Record<string, number> = {};
+      const columnNames: Record<string, string> = {};
 
-    // Daily completion heatmap
-    const dailyCompletion = days.map((day) => ({
-      date: format(day, 'yyyy-MM-dd'),
-      count: Math.floor(Math.random() * 8),
-    }));
+      for (const board of Object.values(boards)) {
+        const boardTyped = board as any;
+        const boardColumns = boardTyped?.columns || [];
+        for (const col of boardColumns) {
+          columnNames[col.id] = col.name;
+        }
+      }
 
-    setStats({
-      totalTasks,
-      completedTasks,
-      inProgressTasks,
-      avgCompletionTime,
-      completionTrend: completedTasks > 0 ? 15 : 0,
-      completionData,
-      timeByColumn,
-      tagDistribution,
-      dailyCompletion,
-    });
+      for (const card of allCards) {
+        if (card.movementHistory && card.movementHistory.length > 0) {
+          for (let i = 0; i < card.movementHistory.length; i++) {
+            const movement = card.movementHistory[i];
+            const columnId = movement.toColumnId;
+            const entryTime = new Date(movement.timestamp).getTime();
+            const exitTime = i < card.movementHistory.length - 1
+              ? new Date(card.movementHistory[i + 1].timestamp).getTime()
+              : Date.now();
+
+            const timeSpent = exitTime - entryTime;
+            columnTimeMap[columnId] = (columnTimeMap[columnId] || 0) + timeSpent;
+          }
+        }
+      }
+
+      const chartColors: Record<string, string> = {
+        [COLUMN_IDS.TODO]: '#6366F1',
+        [COLUMN_IDS.DOING]: '#EC4899',
+        [COLUMN_IDS.DONE]: '#10B981',
+      };
+
+      const timeByColumn = Object.entries(columnTimeMap)
+        .map(([columnId, time]) => ({
+          columnName: columnNames[columnId] || columnId,
+          time,
+          color: chartColors[columnId] || '#6366F1',
+        }))
+        .sort((a, b) => b.time - a.time);
+
+      // Tag distribution — count tags across all cards
+      const tagCounts: Record<string, number> = {};
+      allCards.forEach((card) => {
+        if (card.tags) {
+          card.tags.forEach((tag) => {
+            tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+          });
+        }
+      });
+
+      const tagDistribution = Object.entries(tagCounts)
+        .map(([tag, count]) => ({
+          tag,
+          count,
+          percentage: totalTasks > 0 ? (count / totalTasks) * 100 : 0,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8);
+
+      // Daily completion data for heatmap
+      const dailyCompletion = days.map((day) => {
+        const dayKey = format(day, 'yyyy-MM-dd');
+        const dayCards = cardsByDate[dayKey] || [];
+        return {
+          date: dayKey,
+          count: dayCards.filter((c) => c.columnId === COLUMN_IDS.DONE).length,
+        };
+      });
+
+      // Simple completion trend (compare first vs second half of period)
+      const midpoint = Math.floor(days.length / 2);
+      const firstHalf = completionData.slice(0, midpoint);
+      const secondHalf = completionData.slice(midpoint);
+      const firstHalfTotal = firstHalf.reduce((sum, d) => sum + d.completed, 0);
+      const secondHalfTotal = secondHalf.reduce((sum, d) => sum + d.completed, 0);
+      const completionTrend = firstHalfTotal > 0
+        ? Math.round(((secondHalfTotal - firstHalfTotal) / firstHalfTotal) * 100)
+        : secondHalfTotal > 0 ? 100 : 0;
+
+      setStats({
+        totalTasks,
+        completedTasks,
+        inProgressTasks,
+        avgCompletionTime,
+        completionTrend,
+        completionData,
+        timeByColumn,
+        tagDistribution,
+        dailyCompletion,
+      });
+    } catch (error) {
+      console.error('Error calculating stats:', error);
+    }
   };
 
   return stats;

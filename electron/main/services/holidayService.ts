@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import log from 'electron-log';
 
 interface HolidayAPIResponse {
   id: string;
@@ -70,10 +71,10 @@ export class HolidayService {
         source: 'api' as const,
       }));
     } catch (error) {
-      console.error('Error fetching holidays:', error);
+      log.error('Error fetching holidays:', error);
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
-          console.log('No holidays found for this country/year');
+          log.info('No holidays found for this country/year');
           return [];
         }
         if (error.code === 'ECONNABORTED') {
@@ -94,7 +95,7 @@ export class HolidayService {
         languages: country.officialLanguages || [],
       }));
     } catch (error) {
-      console.error('Error fetching countries:', error);
+      log.error('Error fetching countries:', error);
       throw new Error('Failed to fetch countries from API');
     }
   }

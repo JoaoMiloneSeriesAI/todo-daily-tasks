@@ -19,7 +19,7 @@ export function CalendarHeader({
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-2">
         <CalendarIcon className="text-primary-main" size={28} />
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
           {format(currentMonth, 'MMMM yyyy')}
         </h2>
       </div>
@@ -36,18 +36,18 @@ export function CalendarHeader({
         <div className="flex items-center gap-1">
           <button
             onClick={onPreviousMonth}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-[var(--color-surface-hover)] rounded-lg transition-colors"
             aria-label="Previous month"
           >
-            <ChevronLeft size={20} className="text-gray-600" />
+            <ChevronLeft size={20} className="text-[var(--color-text-secondary)]" />
           </button>
 
           <button
             onClick={onNextMonth}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-[var(--color-surface-hover)] rounded-lg transition-colors"
             aria-label="Next month"
           >
-            <ChevronRight size={20} className="text-gray-600" />
+            <ChevronRight size={20} className="text-[var(--color-text-secondary)]" />
           </button>
         </div>
       </div>

@@ -1,9 +1,11 @@
+import { Card } from './card';
 import { Column } from './column';
 
 export interface BoardData {
   date: string; // YYYY-MM-DD format
   columns: Column[];
   metadata: BoardMetadata;
+  _cards: Card[];
 }
 
 export interface BoardMetadata {

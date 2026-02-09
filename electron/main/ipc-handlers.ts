@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import log from 'electron-log';
 import { DataService } from './services/dataService';
 import { HolidayService } from './services/holidayService';
 import { ExportImportService } from './services/exportImportService';
@@ -13,7 +14,7 @@ export function setupIpcHandlers() {
     try {
       return await dataService.getBoard(key);
     } catch (error) {
-      console.error('Error loading data:', error);
+      log.error('Error loading data:', error);
       return null;
     }
   });
@@ -22,8 +23,17 @@ export function setupIpcHandlers() {
     try {
       await dataService.saveBoard(key, data);
     } catch (error) {
-      console.error('Error saving data:', error);
+      log.error('Error saving data:', error);
       throw error;
+    }
+  });
+
+  ipcMain.handle('load-data-range', async (_, startDate: string, endDate: string) => {
+    try {
+      return await dataService.getBoardsInRange(startDate, endDate);
+    } catch (error) {
+      log.error('Error loading data range:', error);
+      return {};
     }
   });
 
@@ -32,7 +42,7 @@ export function setupIpcHandlers() {
     try {
       return await dataService.getSettings();
     } catch (error) {
-      console.error('Error getting settings:', error);
+      log.error('Error getting settings:', error);
       throw error;
     }
   });
@@ -41,7 +51,7 @@ export function setupIpcHandlers() {
     try {
       await dataService.updateSettings(settings);
     } catch (error) {
-      console.error('Error updating settings:', error);
+      log.error('Error updating settings:', error);
       throw error;
     }
   });
@@ -51,7 +61,7 @@ export function setupIpcHandlers() {
     try {
       return await holidayService.fetchHolidays(params);
     } catch (error) {
-      console.error('Error fetching holidays:', error);
+      log.error('Error fetching holidays:', error);
       throw error;
     }
   });
@@ -60,7 +70,7 @@ export function setupIpcHandlers() {
     try {
       return await holidayService.fetchCountries();
     } catch (error) {
-      console.error('Error fetching countries:', error);
+      log.error('Error fetching countries:', error);
       throw error;
     }
   });
@@ -70,7 +80,7 @@ export function setupIpcHandlers() {
     try {
       return await exportImportService.exportData(data);
     } catch (error) {
-      console.error('Error exporting data:', error);
+      log.error('Error exporting data:', error);
       return { success: false };
     }
   });
@@ -79,7 +89,7 @@ export function setupIpcHandlers() {
     try {
       return await exportImportService.importData();
     } catch (error) {
-      console.error('Error importing data:', error);
+      log.error('Error importing data:', error);
       return { success: false };
     }
   });

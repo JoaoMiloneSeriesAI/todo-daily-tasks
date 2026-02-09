@@ -1,23 +1,18 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import log from 'electron-log';
 import { setupIpcHandlers } from './ipc-handlers';
 import { createMainWindow } from './window';
+
+// Configure electron-log as default logger
+log.transports.file.level = 'info';
+log.transports.console.level = 'info';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let mainWindow: BrowserWindow | null = null;
-
-// Handle creating/removing shortcuts on Windows when installing/uninstalling
-try {
-  if (require('electron-squirrel-startup')) {
-    app.quit();
-  }
-} catch (e) {
-  // electron-squirrel-startup is optional, only needed for Windows builds
-  console.log('electron-squirrel-startup not available (optional)');
-}
 
 function initialize() {
   // Create main window

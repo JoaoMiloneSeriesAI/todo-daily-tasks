@@ -61,7 +61,7 @@ export function Modal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            className="fixed inset-0 bg-[var(--color-overlay)] z-40"
           />
 
           {/* Modal */}
@@ -71,19 +71,19 @@ export function Modal({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className={`bg-white rounded-xl shadow-xl w-full ${sizeStyles[size]} max-h-[90vh] overflow-hidden flex flex-col`}
+              className={`bg-[var(--color-surface)] rounded-xl shadow-xl w-full ${sizeStyles[size]} max-h-[90vh] overflow-hidden flex flex-col`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+              <div className="px-6 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
+                <h2 className="text-xl font-bold text-[var(--color-text-primary)]">{title}</h2>
                 {showCloseButton && (
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-2 hover:bg-[var(--color-surface-hover)] rounded-lg transition-colors"
                     aria-label="Close modal"
                   >
-                    <X size={20} className="text-gray-500" />
+                    <X size={20} className="text-[var(--color-text-secondary)]" />
                   </button>
                 )}
               </div>

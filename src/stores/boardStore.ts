@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { Card, CardMovement, MigrationOption } from '../types/card';
 import { Column, COLUMN_IDS } from '../types/column';
 import { format } from 'date-fns';
+import { getNextWorkDay } from '../utils/dateHelpers';
+import { useSettingsStore } from './settingsStore';
+import { ipcService } from '../services/ipcService';
 
 interface BoardStore {
   columns: Column[];
@@ -21,6 +24,7 @@ interface BoardStore {
   moveCard: (cardId: string, toColumnId: string) => void;
   deleteCard: (cardId: string) => void;
   duplicateCard: (cardId: string) => void;
+  moveCardToDate: (cardId: string, currentDate: Date) => Promise<void>;
 
   // Data persistence
   setSelectedDate: (date: Date) => void;
@@ -220,6 +224,58 @@ export const useBoardStore = create<BoardStore>((set, get) => ({
     get().saveBoardData();
   },
 
+  moveCardToDate: async (cardId, currentDate) => {
+    const { cards } = get();
+    const card = cards.find((c) => c.id === cardId);
+    if (!card) return;
+
+    const settingsState = useSettingsStore.getState();
+    const targetDate = getNextWorkDay(currentDate, settingsState.settings.workDays);
+    const targetDateKey = format(targetDate, 'yyyy-MM-dd');
+
+    try {
+      // Load target date's board
+      const targetBoard = await ipcService.loadBoard(targetDateKey);
+      const targetCards: Card[] = (targetBoard as any)?._cards || [];
+      const targetColumns: Column[] = (targetBoard as any)?.columns || [
+        { id: COLUMN_IDS.TODO, name: 'TODO', position: 0, isStatic: true },
+        { id: COLUMN_IDS.DOING, name: 'Doing', position: 1, isStatic: true },
+        { id: COLUMN_IDS.DONE, name: 'Done', position: 2, isStatic: true },
+      ];
+
+      // Add card to target board's TODO column
+      const movedCard: Card = {
+        ...card,
+        columnId: COLUMN_IDS.TODO,
+        movementHistory: [
+          ...card.movementHistory,
+          {
+            id: crypto.randomUUID(),
+            fromColumnId: card.columnId,
+            toColumnId: COLUMN_IDS.TODO,
+            timestamp: new Date(),
+          },
+        ],
+      };
+
+      // Save to target date
+      await ipcService.saveBoard(targetDateKey, {
+        date: targetDateKey,
+        columns: targetColumns,
+        metadata: { lastModified: new Date(), version: '2.0' },
+        _cards: [...targetCards, movedCard],
+      });
+
+      // Remove from current board
+      set((state) => ({
+        cards: state.cards.filter((c) => c.id !== cardId),
+      }));
+      get().saveBoardData();
+    } catch (error) {
+      console.error('Error moving card to next day:', error);
+    }
+  },
+
   // Data persistence
   setSelectedDate: (date) => {
     set({ selectedDate: date });
@@ -231,7 +287,7 @@ export const useBoardStore = create<BoardStore>((set, get) => ({
     const dateKey = format(date, 'yyyy-MM-dd');
 
     try {
-      const boardData = await window.electronAPI.loadData(dateKey);
+      const boardData = await ipcService.loadBoard(dateKey);
 
       if (boardData && typeof boardData === 'object') {
         const data = boardData as { columns?: Column[]; _cards?: Card[] };
@@ -264,16 +320,15 @@ export const useBoardStore = create<BoardStore>((set, get) => ({
     const dateKey = format(selectedDate, 'yyyy-MM-dd');
 
     try {
-      await window.electronAPI.saveData(dateKey, {
+      await ipcService.saveBoard(dateKey, {
         date: dateKey,
         columns,
         metadata: {
           lastModified: new Date(),
           version: '2.0',
         },
-        // Store cards separately in the data object
         _cards: cards,
-      } as any);
+      });
     } catch (error) {
       console.error('Error saving board data:', error);
     }

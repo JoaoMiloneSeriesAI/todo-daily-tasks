@@ -1,4 +1,5 @@
 import Store from 'electron-store';
+import log from 'electron-log';
 import { DEFAULT_SETTINGS } from '../../../src/types/settings';
 
 interface DataSchema {
@@ -31,7 +32,7 @@ export class DataService {
       const boards = this.store.get('boards');
       return boards[date] || null;
     } catch (error) {
-      console.error('Error getting board:', error);
+      log.error('Error getting board:', error);
       return null;
     }
   }
@@ -42,7 +43,7 @@ export class DataService {
       boards[date] = board;
       this.store.set('boards', boards);
     } catch (error) {
-      console.error('Error saving board:', error);
+      log.error('Error saving board:', error);
       throw error;
     }
   }
@@ -52,7 +53,7 @@ export class DataService {
     try {
       return this.store.get('settings');
     } catch (error) {
-      console.error('Error getting settings:', error);
+      log.error('Error getting settings:', error);
       return DEFAULT_SETTINGS;
     }
   }
@@ -62,7 +63,7 @@ export class DataService {
       const current = this.store.get('settings');
       this.store.set('settings', { ...current, ...settings });
     } catch (error) {
-      console.error('Error updating settings:', error);
+      log.error('Error updating settings:', error);
       throw error;
     }
   }
@@ -72,7 +73,7 @@ export class DataService {
     try {
       return this.store.get('templates');
     } catch (error) {
-      console.error('Error getting templates:', error);
+      log.error('Error getting templates:', error);
       return [];
     }
   }
@@ -81,8 +82,27 @@ export class DataService {
     try {
       this.store.set('templates', templates);
     } catch (error) {
-      console.error('Error saving templates:', error);
+      log.error('Error saving templates:', error);
       throw error;
+    }
+  }
+
+  // Bulk data loading for dashboard
+  async getBoardsInRange(startDate: string, endDate: string): Promise<Record<string, unknown>> {
+    try {
+      const boards = this.store.get('boards');
+      const result: Record<string, unknown> = {};
+
+      for (const [dateKey, boardData] of Object.entries(boards)) {
+        if (dateKey >= startDate && dateKey <= endDate) {
+          result[dateKey] = boardData;
+        }
+      }
+
+      return result;
+    } catch (error) {
+      log.error('Error getting boards in range:', error);
+      return {};
     }
   }
 
@@ -91,7 +111,7 @@ export class DataService {
     try {
       return this.store.get('tags');
     } catch (error) {
-      console.error('Error getting tags:', error);
+      log.error('Error getting tags:', error);
       return [];
     }
   }
@@ -100,7 +120,7 @@ export class DataService {
     try {
       this.store.set('tags', tags);
     } catch (error) {
-      console.error('Error saving tags:', error);
+      log.error('Error saving tags:', error);
       throw error;
     }
   }

@@ -1,0 +1,61 @@
+/* Light theme (default) */
+:root {
+  --color-bg-primary: #F8F9FB;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary: #F3F4F6;
+  --color-bg-elevated: #FFFFFF;
+
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F9FAFB;
+  --color-surface-active: #F3F4F6;
+
+  --color-input-bg: #F9FAFB;
+  --color-input-border: #E5E7EB;
+  --color-input-focus-bg: #FFFFFF;
+
+  --color-scrollbar-track: #F3F4F6;
+  --color-scrollbar-thumb: #D1D5DB;
+  --color-scrollbar-thumb-hover: #9CA3AF;
+
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-sm: rgba(0, 0, 0, 0.05);
+  --color-overlay: rgba(0, 0, 0, 0.5);
+}
+
+/* Dark theme */
+.dark {
+  --color-bg-primary: #0F172A;
+  --color-bg-secondary: #1E293B;
+  --color-bg-tertiary: #334155;
+  --color-bg-elevated: #1E293B;
+
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-tertiary: #64748B;
+
+  --color-border: #334155;
+  --color-border-light: #1E293B;
+
+  --color-surface: #1E293B;
+  --color-surface-hover: #334155;
+  --color-surface-active: #475569;
+
+  --color-input-bg: #1E293B;
+  --color-input-border: #334155;
+  --color-input-focus-bg: #0F172A;
+
+  --color-scrollbar-track: #1E293B;
+  --color-scrollbar-thumb: #475569;
+  --color-scrollbar-thumb-hover: #64748B;
+
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-sm: rgba(0, 0, 0, 0.2);
+  --color-overlay: rgba(0, 0, 0, 0.7);
+}

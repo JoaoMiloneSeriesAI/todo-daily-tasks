@@ -25,8 +25,8 @@ export function Button({
 
   const variantStyles = {
     primary: 'bg-primary-main text-white hover:bg-primary-dark focus:ring-primary-main',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-300',
-    icon: 'bg-transparent text-gray-600 hover:bg-gray-100 focus:ring-gray-300',
+    secondary: 'bg-[var(--color-surface-active)] text-[var(--color-text-primary)] hover:bg-[var(--color-border)] focus:ring-[var(--color-border)]',
+    icon: 'bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] focus:ring-[var(--color-border)]',
     danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500',
   };
 

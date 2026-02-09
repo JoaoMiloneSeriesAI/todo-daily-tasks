@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { CalendarDay, Holiday } from '../types/calendar';
 import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, isToday } from 'date-fns';
+import { ipcService } from '../services/ipcService';
 
 interface CalendarStore {
   currentMonth: Date;
@@ -68,13 +69,13 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
 
     try {
       // Get settings to know which country
-      const settings = await window.electronAPI.getSettings();
+      const settings = await ipcService.getSettings();
 
       if (settings && typeof settings === 'object') {
         const settingsData = settings as any;
 
         if (settingsData.holidays?.autoFetch) {
-          const apiHolidays = await window.electronAPI.fetchHolidays({
+          const apiHolidays = await ipcService.fetchHolidays({
             countryCode: settingsData.holidays.country,
             year,
           });

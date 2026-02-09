@@ -18,7 +18,7 @@ import { NerdStatsModal } from './NerdStatsModal';
 import { Card as CardType } from '../../types/card';
 import { format } from 'date-fns';
 import { Calendar, Plus } from 'lucide-react';
-import { Button } from '../shared';
+import { Button, Input, Modal } from '../shared';
 import { toast } from '../shared/Toast';
 
 interface BoardProps {
@@ -26,7 +26,7 @@ interface BoardProps {
 }
 
 export function Board({ selectedDate }: BoardProps) {
-  const { columns, cards, getCardsByColumn, moveCard, addCard, updateCard, deleteCard, duplicateCard } =
+  const { columns, cards, getCardsByColumn, moveCard, addCard, updateCard, deleteCard, duplicateCard, addColumn, updateColumn, deleteColumn } =
     useBoardStore();
 
   const [activeCard, setActiveCard] = useState<CardType | null>(null);
@@ -35,6 +35,15 @@ export function Board({ selectedDate }: BoardProps) {
   const [selectedColumnId, setSelectedColumnId] = useState<string>('');
   const [statsCard, setStatsCard] = useState<CardType | undefined>();
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
+
+  // Add Column state
+  const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
+  const [newColumnName, setNewColumnName] = useState('');
+
+  // Delete Column state
+  const [deleteColumnId, setDeleteColumnId] = useState<string | null>(null);
+  const [migrationOption, setMigrationOption] = useState<'moveToTodo' | 'moveToColumn' | 'deleteAll'>('moveToTodo');
+  const [migrationTargetId, setMigrationTargetId] = useState<string>('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -88,7 +97,7 @@ export function Board({ selectedDate }: BoardProps) {
         origin: { y: 0.6 },
         colors: ['#6366F1', '#EC4899', '#14B8A6', '#F59E0B'],
       });
-      toast.success(`Task "${card?.title}" completed! 🎉`);
+      toast.success(`Task "${card?.title}" completed!`);
     }
 
     setActiveCard(null);
@@ -113,10 +122,8 @@ export function Board({ selectedDate }: BoardProps) {
 
   const handleSaveCard = (cardData: Partial<CardType>) => {
     if (editingCard) {
-      // Update existing card
       updateCard(editingCard.id, cardData);
     } else {
-      // Create new card
       if (!cardData.title) return;
 
       addCard(selectedColumnId, {
@@ -130,29 +137,54 @@ export function Board({ selectedDate }: BoardProps) {
     }
   };
 
+  const handleAddColumn = () => {
+    if (!newColumnName.trim()) return;
+    addColumn(newColumnName.trim());
+    setNewColumnName('');
+    setIsAddColumnModalOpen(false);
+    toast.success(`Column "${newColumnName.trim()}" created`);
+  };
+
+  const handleRenameColumn = (columnId: string, newName: string) => {
+    if (!newName.trim()) return;
+    updateColumn(columnId, { name: newName.trim() });
+  };
+
+  const handleDeleteColumnConfirm = () => {
+    if (!deleteColumnId) return;
+    deleteColumn(deleteColumnId, migrationOption, migrationTargetId || undefined);
+    const columnName = columns.find((c) => c.id === deleteColumnId)?.name;
+    toast.info(`Column "${columnName}" deleted`);
+    setDeleteColumnId(null);
+    setMigrationOption('moveToTodo');
+    setMigrationTargetId('');
+  };
+
+  const columnToDelete = deleteColumnId ? columns.find((c) => c.id === deleteColumnId) : null;
+  const cardsInDeleteColumn = deleteColumnId ? cards.filter((c) => c.columnId === deleteColumnId).length : 0;
+  const otherColumns = columns.filter((c) => c.id !== deleteColumnId);
+
+  const handleMoveCardToNextDay = async (cardId: string) => {
+    const { moveCardToDate } = useBoardStore.getState();
+    await moveCardToDate(cardId, selectedDate);
+  };
+
   return (
     <div className="h-full flex flex-col">
       {/* Board Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <div className="bg-[var(--color-surface)] rounded-xl shadow-sm p-6 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Calendar className="text-primary-main" size={28} />
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
                 {format(selectedDate, 'EEEE, MMMM d, yyyy')}
               </h2>
-              <p className="text-sm text-gray-600">
-                {cards.length} tasks total • {cards.filter((c) => c.columnId === 'done').length}{' '}
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                {cards.length} tasks total &bull; {cards.filter((c) => c.columnId === 'done').length}{' '}
                 completed
               </p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" size="sm">
-              <Plus size={16} className="mr-1" />
-              Add Column
-            </Button>
           </div>
         </div>
       </div>
@@ -178,8 +210,22 @@ export function Board({ selectedDate }: BoardProps) {
                   onDeleteCard={deleteCard}
                   onDuplicateCard={duplicateCard}
                   onViewStats={handleViewStats}
+                  onRenameColumn={(name) => handleRenameColumn(column.id, name)}
+                  onDeleteColumn={() => setDeleteColumnId(column.id)}
+                  onMoveCardToNextDay={handleMoveCardToNextDay}
                 />
               ))}
+
+            {/* Add Column Button */}
+            <div className="flex-shrink-0 w-80">
+              <button
+                onClick={() => setIsAddColumnModalOpen(true)}
+                className="w-full py-3 px-4 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] text-sm font-medium rounded-lg border-2 border-dashed border-[var(--color-border)] transition-colors flex items-center justify-center gap-2"
+              >
+                <Plus size={16} />
+                Add Column
+              </button>
+            </div>
           </div>
 
           <DragOverlay>
@@ -191,6 +237,7 @@ export function Board({ selectedDate }: BoardProps) {
                   onDelete={() => {}}
                   onDuplicate={() => {}}
                   onViewStats={() => {}}
+                  onMoveToNextDay={() => {}}
                 />
               </div>
             ) : null}
@@ -215,6 +262,119 @@ export function Board({ selectedDate }: BoardProps) {
           card={statsCard}
         />
       )}
+
+      {/* Add Column Modal */}
+      <Modal
+        isOpen={isAddColumnModalOpen}
+        onClose={() => { setIsAddColumnModalOpen(false); setNewColumnName(''); }}
+        title="Add Column"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <Input
+            label="Column Name"
+            required
+            value={newColumnName}
+            onChange={(e) => setNewColumnName(e.target.value)}
+            placeholder="Enter column name..."
+            onKeyDown={(e) => e.key === 'Enter' && handleAddColumn()}
+          />
+          <div className="flex gap-2 justify-end">
+            <Button variant="secondary" onClick={() => { setIsAddColumnModalOpen(false); setNewColumnName(''); }}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleAddColumn}>
+              Create Column
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Column Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteColumnId}
+        onClose={() => setDeleteColumnId(null)}
+        title="Delete Column"
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-[var(--color-text-primary)]">
+            Are you sure you want to delete <strong>{columnToDelete?.name}</strong>?
+            {cardsInDeleteColumn > 0 && (
+              <span className="text-[var(--color-text-secondary)]">
+                {' '}{cardsInDeleteColumn} card{cardsInDeleteColumn !== 1 ? 's' : ''} will be affected.
+              </span>
+            )}
+          </p>
+
+          {cardsInDeleteColumn > 0 && (
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)]">
+                What should happen to the cards?
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="migration"
+                  checked={migrationOption === 'moveToTodo'}
+                  onChange={() => setMigrationOption('moveToTodo')}
+                  className="text-primary-main"
+                />
+                <span className="text-sm text-[var(--color-text-primary)]">Move all cards to TODO</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="migration"
+                  checked={migrationOption === 'moveToColumn'}
+                  onChange={() => setMigrationOption('moveToColumn')}
+                  className="text-primary-main"
+                />
+                <span className="text-sm text-[var(--color-text-primary)]">Move to another column:</span>
+              </label>
+
+              {migrationOption === 'moveToColumn' && (
+                <select
+                  value={migrationTargetId}
+                  onChange={(e) => setMigrationTargetId(e.target.value)}
+                  className="w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm"
+                >
+                  <option value="">Select column...</option>
+                  {otherColumns.map((col) => (
+                    <option key={col.id} value={col.id}>{col.name}</option>
+                  ))}
+                </select>
+              )}
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="migration"
+                  checked={migrationOption === 'deleteAll'}
+                  onChange={() => setMigrationOption('deleteAll')}
+                  className="text-primary-main"
+                />
+                <span className="text-sm text-red-600">Delete all cards in this column</span>
+              </label>
+            </div>
+          )}
+
+          <div className="flex gap-2 justify-end pt-4 border-t border-[var(--color-border)]">
+            <Button variant="secondary" onClick={() => setDeleteColumnId(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDeleteColumnConfirm}
+              disabled={migrationOption === 'moveToColumn' && !migrationTargetId}
+            >
+              Delete Column
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
