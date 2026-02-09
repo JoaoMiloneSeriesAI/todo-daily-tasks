@@ -48,14 +48,18 @@ export function Modal({
     };
   }, [isOpen]);
 
-  // Auto-focus first focusable element and return focus on close
+  // Auto-focus first non-input focusable element (button, link) so that
+  // opening a modal doesn't immediately activate an editable field.
   useEffect(() => {
     if (isOpen && modalRef.current) {
       const focusable = modalRef.current.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, [href], [tabindex]:not([tabindex="-1"])'
       );
       if (focusable.length > 0) {
         focusable[0].focus();
+      } else {
+        // Fallback: focus the modal container itself
+        modalRef.current.focus();
       }
     } else if (!isOpen && previousFocusRef.current) {
       previousFocusRef.current.focus();
@@ -129,7 +133,8 @@ export function Modal({
               role="dialog"
               aria-modal="true"
               aria-labelledby={title ? titleId : undefined}
-              className={`bg-[var(--color-surface)] rounded-xl shadow-xl w-full ${sizeStyles[size]} max-h-[90vh] overflow-hidden flex flex-col`}
+              tabIndex={-1}
+              className={`bg-[var(--color-surface)] rounded-xl shadow-xl w-full ${sizeStyles[size]} max-h-[90vh] overflow-hidden flex flex-col outline-none`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Color bar (optional) */}
