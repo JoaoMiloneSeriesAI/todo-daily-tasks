@@ -165,7 +165,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
                   exit={{ opacity: 0 }}
                   className="flex items-center gap-1 text-xs text-green-600 whitespace-nowrap flex-shrink-0"
                 >
-                  <Check size={12} /> Saved
+                  <Check size={12} /> {t('common.saved')}
                 </motion.div>
               )}
             </AnimatePresence>

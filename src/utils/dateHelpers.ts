@@ -1,5 +1,6 @@
-import { format, isToday as isTodayFn, isSameDay } from 'date-fns';
+import { format, isToday as isTodayFn, isSameDay, startOfWeek, addDays } from 'date-fns';
 import { WorkDaysSettings } from '../types/settings';
+import { getDateLocale } from './dateFnsLocale';
 
 /**
  * Check if a date is today
@@ -31,22 +32,18 @@ export function isWorkDay(date: Date, workDaysSettings: WorkDaysSettings): boole
  * Format a date for display
  */
 export function formatDate(date: Date, formatStr: string = 'MMMM d, yyyy'): string {
-  return format(date, formatStr);
+  return format(date, formatStr, { locale: getDateLocale() });
 }
 
 /**
  * Get week days based on first day of week setting
  */
 export function getWeekDays(firstDayOfWeek: 0 | 1): string[] {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  if (firstDayOfWeek === 1) {
-    // Start with Monday
-    return [...days.slice(1), days[0]];
-  }
-
-  // Start with Sunday (default)
-  return days;
+  const locale = getDateLocale();
+  const start = startOfWeek(new Date(), { weekStartsOn: firstDayOfWeek });
+  return Array.from({ length: 7 }, (_, i) =>
+    format(addDays(start, i), 'EEE', { locale })
+  );
 }
 
 /**

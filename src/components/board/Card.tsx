@@ -194,7 +194,7 @@ export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, on
             <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
               <CheckSquare size={14} />
               <span className="font-medium">{completedItems}/{totalItems}</span>
-              <div className="flex-1 h-1.5 bg-[var(--color-bg-tertiary)] rounded-full overflow-hidden" role="progressbar" aria-valuenow={completedItems} aria-valuemin={0} aria-valuemax={totalItems} aria-label="Checklist progress">
+              <div className="flex-1 h-1.5 bg-[var(--color-bg-tertiary)] rounded-full overflow-hidden" role="progressbar" aria-valuenow={completedItems} aria-valuemin={0} aria-valuemax={totalItems} aria-label={t('common.checklistProgress')}>
                 <div
                   className="h-full bg-green-500 transition-all duration-300"
                   style={{ width: `${totalItems > 0 ? (completedItems / totalItems) * 100 : 0}%` }}

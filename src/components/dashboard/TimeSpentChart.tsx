@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TimeByColumnData } from '../../types/board';
 import { TimeTracker } from '../../utils/timeTracking';
@@ -8,6 +9,7 @@ interface TimeSpentChartProps {
 }
 
 export function TimeSpentChart({ data }: TimeSpentChartProps) {
+  const { t } = useTranslation();
   const accent = useMemo(() => {
     return getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || '#6366F1';
   }, []);
@@ -31,7 +33,7 @@ export function TimeSpentChart({ data }: TimeSpentChartProps) {
           <YAxis
             tick={{ fontSize: 12, fill: 'var(--color-text-secondary)' }}
             stroke="var(--color-text-tertiary)"
-            label={{ value: 'Hours', angle: -90, position: 'insideLeft', fontSize: 12 }}
+            label={{ value: t('dashboard.hours'), angle: -90, position: 'insideLeft', fontSize: 12 }}
           />
           <Tooltip
             contentStyle={{

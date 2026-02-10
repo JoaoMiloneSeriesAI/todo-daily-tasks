@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { DateRange, DashboardStats, BoardData } from '../types/board';
 import { Card } from '../types/card';
 import { format, eachDayOfInterval } from 'date-fns';
+import { getDateLocale } from '../utils/dateFnsLocale';
 import { TimeTracker } from '../utils/timeTracking';
 import { COLUMN_IDS } from '../types/column';
 import { ipcService } from '../services/ipcService';
@@ -64,7 +65,7 @@ export function useStats(dateRange: DateRange): DashboardStats {
         const dayCards = cardsByDate[dayKey] || [];
         const completed = dayCards.filter((c) => c.columnId === COLUMN_IDS.DONE).length;
         return {
-          date: format(day, 'MMM d'),
+          date: format(day, 'MMM d', { locale: getDateLocale() }),
           completed,
         };
       });

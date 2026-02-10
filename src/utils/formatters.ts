@@ -1,5 +1,6 @@
 import { format as dateFnsFormat } from 'date-fns';
 import { AppSettings } from '../types/settings';
+import { getDateLocale } from './dateFnsLocale';
 
 /// <summary>
 /// Formats a duration in milliseconds to a human-readable string.
@@ -41,9 +42,9 @@ export function formatDuration(milliseconds: number): string {
 export function formatDate(date: Date, settings?: AppSettings): string {
   const dateFormat = settings?.general?.dateFormat || 'MM/dd/yyyy';
   try {
-    return dateFnsFormat(date, dateFormat);
+    return dateFnsFormat(date, dateFormat, { locale: getDateLocale() });
   } catch {
-    return dateFnsFormat(date, 'MM/dd/yyyy');
+    return dateFnsFormat(date, 'MM/dd/yyyy', { locale: getDateLocale() });
   }
 }
 
@@ -54,9 +55,9 @@ export function formatTime(date: Date, settings?: AppSettings): string {
   const timeFormat = settings?.general?.timeFormat || '12h';
   const formatStr = timeFormat === '24h' ? 'HH:mm' : 'h:mm a';
   try {
-    return dateFnsFormat(date, formatStr);
+    return dateFnsFormat(date, formatStr, { locale: getDateLocale() });
   } catch {
-    return dateFnsFormat(date, 'h:mm a');
+    return dateFnsFormat(date, 'h:mm a', { locale: getDateLocale() });
   }
 }
 

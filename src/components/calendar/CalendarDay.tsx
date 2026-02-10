@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarDay as CalendarDayType } from '../../types/calendar';
 import { format, isSameMonth } from 'date-fns';
+import { getDateLocale } from '../../utils/dateFnsLocale';
 
 interface CalendarDayProps {
   day: CalendarDayType;
@@ -14,13 +15,13 @@ export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClic
   const { t } = useTranslation();
   const isCurrentMonth = isSameMonth(day.date, currentMonth);
   const dayNumber = format(day.date, 'd');
-  const fullDate = format(day.date, 'EEEE, MMMM d, yyyy');
+  const fullDate = format(day.date, 'EEEE, MMMM d, yyyy', { locale: getDateLocale() });
 
   // Build accessible label
   const parts = [fullDate];
-  if (day.isToday) parts.push('Today');
-  if (day.isHoliday && day.holidayNames?.length) parts.push(`Holiday: ${day.holidayNames.join(', ')}`);
-  if (day.taskCount > 0) parts.push(`${day.taskCount} tasks, ${day.completedCount} completed`);
+  if (day.isToday) parts.push(t('common.today'));
+  if (day.isHoliday && day.holidayNames?.length) parts.push(`${t('common.holiday')}: ${day.holidayNames.join(', ')}`);
+  if (day.taskCount > 0) parts.push(`${day.taskCount} ${t('common.tasks')}, ${day.completedCount} ${t('common.tasksCompleted')}`);
   const ariaLabel = parts.join('. ');
 
   const bgClass = (() => {

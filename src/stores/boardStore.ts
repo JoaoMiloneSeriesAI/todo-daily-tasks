@@ -5,6 +5,15 @@ import { format } from 'date-fns';
 import { getNextWorkDay } from '../utils/dateHelpers';
 import { useSettingsStore } from './settingsStore';
 import { ipcService } from '../services/ipcService';
+import i18n from '../locales/i18n';
+
+function getDefaultColumns(): Column[] {
+  return [
+    { id: COLUMN_IDS.TODO, name: i18n.t('board.columnTodo'), position: 0, isStatic: true },
+    { id: COLUMN_IDS.DOING, name: i18n.t('board.columnDoing'), position: 1, isStatic: true },
+    { id: COLUMN_IDS.DONE, name: i18n.t('board.columnDone'), position: 2, isStatic: true },
+  ];
+}
 
 interface BoardStore {
   columns: Column[];
@@ -37,11 +46,7 @@ interface BoardStore {
 }
 
 export const useBoardStore = create<BoardStore>((set, get) => ({
-  columns: [
-    { id: COLUMN_IDS.TODO, name: 'TODO', position: 0, isStatic: true },
-    { id: COLUMN_IDS.DOING, name: 'Doing', position: 1, isStatic: true },
-    { id: COLUMN_IDS.DONE, name: 'Done', position: 2, isStatic: true },
-  ],
+  columns: getDefaultColumns(),
   cards: [],
   selectedDate: new Date(),
   isLoading: false,
@@ -206,7 +211,7 @@ export const useBoardStore = create<BoardStore>((set, get) => ({
     const duplicatedCard: Card = {
       ...card,
       id: crypto.randomUUID(),
-      title: `${card.title} (Copy)`,
+      title: `${card.title} ${i18n.t('board.copySuffix')}`,
       createdDate: new Date(),
       movementHistory: [
         {
@@ -237,11 +242,7 @@ export const useBoardStore = create<BoardStore>((set, get) => ({
       // Load target date's board
       const targetBoard = await ipcService.loadBoard(targetDateKey);
       const targetCards: Card[] = (targetBoard as any)?._cards || [];
-      const targetColumns: Column[] = (targetBoard as any)?.columns || [
-        { id: COLUMN_IDS.TODO, name: 'TODO', position: 0, isStatic: true },
-        { id: COLUMN_IDS.DOING, name: 'Doing', position: 1, isStatic: true },
-        { id: COLUMN_IDS.DONE, name: 'Done', position: 2, isStatic: true },
-      ];
+      const targetColumns: Column[] = (targetBoard as any)?.columns || getDefaultColumns();
 
       // Add card to target board's TODO column
       const movedCard: Card = {
@@ -299,11 +300,7 @@ export const useBoardStore = create<BoardStore>((set, get) => ({
       } else {
         // No data for this date, reset to default columns and empty cards
         set({
-          columns: [
-            { id: COLUMN_IDS.TODO, name: 'TODO', position: 0, isStatic: true },
-            { id: COLUMN_IDS.DOING, name: 'Doing', position: 1, isStatic: true },
-            { id: COLUMN_IDS.DONE, name: 'Done', position: 2, isStatic: true },
-          ],
+          columns: getDefaultColumns(),
           cards: [],
           selectedDate: date,
         });

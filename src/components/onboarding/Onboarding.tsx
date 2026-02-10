@@ -12,7 +12,7 @@ interface OnboardingProps {
 
 export function Onboarding({ onComplete }: OnboardingProps) {
   const { settings, updateSettings } = useSettingsStore();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [step, setStep] = useState(0);
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountry, setSelectedCountry] = useState(settings.holidays.country || 'US');
@@ -41,13 +41,13 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const dayLabels = [
-    { key: 'monday' as const, label: 'Mon' },
-    { key: 'tuesday' as const, label: 'Tue' },
-    { key: 'wednesday' as const, label: 'Wed' },
-    { key: 'thursday' as const, label: 'Thu' },
-    { key: 'friday' as const, label: 'Fri' },
-    { key: 'saturday' as const, label: 'Sat' },
-    { key: 'sunday' as const, label: 'Sun' },
+    { key: 'monday' as const, labelKey: 'settingsWorkDays.monday' },
+    { key: 'tuesday' as const, labelKey: 'settingsWorkDays.tuesday' },
+    { key: 'wednesday' as const, labelKey: 'settingsWorkDays.wednesday' },
+    { key: 'thursday' as const, labelKey: 'settingsWorkDays.thursday' },
+    { key: 'friday' as const, labelKey: 'settingsWorkDays.friday' },
+    { key: 'saturday' as const, labelKey: 'settingsWorkDays.saturday' },
+    { key: 'sunday' as const, labelKey: 'settingsWorkDays.sunday' },
   ];
 
   const selectClass = "w-full px-4 py-3 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm";
@@ -58,18 +58,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 bg-[var(--color-accent-light)]">
         <CheckCircle size={40} className="text-[var(--color-accent)]" />
       </div>
-      <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-3">
-        Welcome to Task Manager
-      </h1>
-      <p className="text-[var(--color-text-secondary)] text-lg mb-8 max-w-md mx-auto">
-        A calendar-based Kanban board to organize your daily tasks.
-        Let's set up a few things to get you started.
-      </p>
-      <button
-        onClick={() => setStep(1)}
-        className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold text-lg transition-colors inline-flex items-center gap-2"
-      >
-        Get Started <ChevronRight size={20} />
+      <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-3">{t('onboarding.welcome')}</h1>
+      <p className="text-[var(--color-text-secondary)] text-lg mb-8 max-w-md mx-auto">{t('onboarding.welcomeDesc')}</p>
+      <button onClick={() => setStep(1)} className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold text-lg transition-colors inline-flex items-center gap-2">
+        {t('onboarding.getStarted')} <ChevronRight size={20} />
       </button>
     </div>,
 
@@ -80,28 +72,22 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <Globe size={24} className="text-[var(--color-accent)]" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Country &amp; Work Days</h2>
-          <p className="text-sm text-[var(--color-text-secondary)]">We'll fetch public holidays for your country</p>
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)]">{t('onboarding.countryWorkDays')}</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t('onboarding.countryWorkDaysDesc')}</p>
         </div>
       </div>
 
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Your Country</label>
-          <select
-            value={selectedCountry}
-            onChange={(e) => setSelectedCountry(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Select a country</option>
-            {countries.map((c) => (
-              <option key={c.code} value={c.code}>{c.name}</option>
-            ))}
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">{t('onboarding.yourCountry')}</label>
+          <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} className={selectClass}>
+            <option value="">{t('onboarding.selectCountry')}</option>
+            {countries.map((c) => (<option key={c.code} value={c.code}>{c.name}</option>))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-3">Work Days</label>
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-3">{t('onboarding.workDays')}</label>
           <div className="flex gap-2">
             {dayLabels.map((day) => (
               <button
@@ -113,7 +99,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                     : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]'
                 }`}
               >
-                {day.label}
+                {t(day.labelKey).slice(0, 3)}
               </button>
             ))}
           </div>
@@ -121,17 +107,9 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       </div>
 
       <div className="flex justify-between mt-8">
-        <button
-          onClick={() => setStep(0)}
-          className="px-6 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-        >
-          Back
-        </button>
-        <button
-          onClick={() => setStep(2)}
-          className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
-        >
-          Next <ChevronRight size={20} />
+        <button onClick={() => setStep(0)} className="px-6 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">{t('onboarding.back')}</button>
+        <button onClick={() => setStep(2)} className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold transition-colors inline-flex items-center gap-2">
+          {t('onboarding.next')} <ChevronRight size={20} />
         </button>
       </div>
     </div>,
@@ -143,34 +121,39 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <Palette size={24} className="text-[var(--color-accent)]" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Language &amp; Theme</h2>
-          <p className="text-sm text-[var(--color-text-secondary)]">Choose your preferred language and appearance</p>
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)]">{t('onboarding.languageTheme')}</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t('onboarding.languageThemeDesc')}</p>
         </div>
       </div>
 
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Language</label>
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">{t('onboarding.language')}</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={selectClass}>
             <option value="en">English</option>
             <option value="es">Espanol</option>
+            <option value="pt-BR">Portugues (Brasil)</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-3">Theme</label>
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-3">{t('onboarding.themeLabel')}</label>
           <div className="grid grid-cols-3 gap-3">
-            {(['light', 'dark', 'system'] as const).map((t) => (
+            {([
+              { value: 'light' as const, labelKey: 'onboarding.light' },
+              { value: 'dark' as const, labelKey: 'onboarding.dark' },
+              { value: 'system' as const, labelKey: 'onboarding.auto' },
+            ]).map((opt) => (
               <button
-                key={t}
-                onClick={() => setTheme(t)}
+                key={opt.value}
+                onClick={() => setTheme(opt.value)}
                 className={`py-3 px-4 rounded-lg text-sm font-medium transition-colors border-2 ${
-                  theme === t
+                  theme === opt.value
                     ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)] text-[var(--color-accent)]'
                     : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-tertiary)]'
                 }`}
               >
-                {t === 'light' ? 'Light' : t === 'dark' ? 'Dark' : 'Auto'}
+                {t(opt.labelKey)}
               </button>
             ))}
           </div>
@@ -178,17 +161,9 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       </div>
 
       <div className="flex justify-between mt-8">
-        <button
-          onClick={() => setStep(1)}
-          className="px-6 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-        >
-          Back
-        </button>
-        <button
-          onClick={handleComplete}
-          className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
-        >
-          <Calendar size={20} /> Start Using Task Manager
+        <button onClick={() => setStep(1)} className="px-6 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">{t('onboarding.back')}</button>
+        <button onClick={handleComplete} className="px-8 py-3 text-[var(--color-accent-text)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] rounded-lg font-semibold transition-colors inline-flex items-center gap-2">
+          <Calendar size={20} /> {t('onboarding.startUsing')}
         </button>
       </div>
     </div>,
@@ -197,29 +172,17 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   return (
     <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center p-6">
       <div className="w-full max-w-lg bg-[var(--color-surface)] rounded-2xl shadow-xl p-8">
-        {/* Step indicators */}
         <div className="flex items-center justify-center gap-2 mb-8">
           {[0, 1, 2].map((s) => (
-            <div
-              key={s}
-              className="h-2 rounded-full transition-all duration-300"
-              style={{
-                width: s === step ? '2rem' : '0.5rem',
-                backgroundColor: s <= step ? 'var(--color-accent)' : 'var(--color-border)',
-                opacity: s < step ? 0.5 : 1,
-              }}
-            />
+            <div key={s} className="h-2 rounded-full transition-all duration-300" style={{
+              width: s === step ? '2rem' : '0.5rem',
+              backgroundColor: s <= step ? 'var(--color-accent)' : 'var(--color-border)',
+              opacity: s < step ? 0.5 : 1,
+            }} />
           ))}
         </div>
-
         <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
-          >
+          <motion.div key={step} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.2, ease: 'easeInOut' }}>
             {steps[step]}
           </motion.div>
         </AnimatePresence>

@@ -6,6 +6,7 @@ import { useBoardStore } from '../../stores/boardStore';
 import { useTimeTracking } from '../../hooks/useTimeTracking';
 import { TimeTracker } from '../../utils/timeTracking';
 import { format } from 'date-fns';
+import { getDateLocale } from '../../utils/dateFnsLocale';
 import { Clock, TrendingUp, Calendar, Activity } from 'lucide-react';
 
 interface NerdStatsModalProps {
@@ -168,7 +169,7 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
                       <div className="flex items-center gap-1 text-xs text-[var(--color-text-tertiary)] mt-1">
                         <Calendar size={12} />
                         <span>
-                          {format(new Date(movement.timestamp), 'MMM d, yyyy h:mm a')}
+                          {format(new Date(movement.timestamp), 'MMM d, yyyy h:mm a', { locale: getDateLocale() })}
                         </span>
                       </div>
                     </div>
@@ -185,7 +186,7 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
             <div>
               <span className="text-[var(--color-text-secondary)]">{t('stats.created')}</span>
               <span className="ml-2 font-medium text-[var(--color-text-primary)]">
-                {format(new Date(card.createdDate), 'MMM d, yyyy h:mm a')}
+                {format(new Date(card.createdDate), 'MMM d, yyyy h:mm a', { locale: getDateLocale() })}
               </span>
             </div>
             {timeData.isCompleted && (
@@ -197,7 +198,8 @@ export function NerdStatsModal({ isOpen, onClose, card }: NerdStatsModalProps) {
                         new Date(
                           movements.find((m) => m.toColumnId === 'done')!.timestamp
                         ),
-                        'MMM d, yyyy h:mm a'
+                        'MMM d, yyyy h:mm a',
+                        { locale: getDateLocale() }
                       )
                     : 'N/A'}
                 </span>

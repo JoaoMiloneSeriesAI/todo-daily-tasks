@@ -21,6 +21,7 @@ import { CardModal } from './CardModal';
 import { NerdStatsModal } from './NerdStatsModal';
 import { Card as CardType } from '../../types/card';
 import { format } from 'date-fns';
+import { getDateLocale } from '../../utils/dateFnsLocale';
 import { motion } from 'framer-motion';
 import { Calendar, Plus, ArrowLeft, PartyPopper } from 'lucide-react';
 import { Button, Input, Modal } from '../shared';
@@ -207,7 +208,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
             <Calendar className="text-[var(--color-accent)]" size={28} />
             <div>
               <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
-                {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+                {format(selectedDate, 'EEEE, MMMM d, yyyy', { locale: getDateLocale() })}
               </h2>
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-sm text-[var(--color-text-secondary)]">

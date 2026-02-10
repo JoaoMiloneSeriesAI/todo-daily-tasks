@@ -1,3 +1,5 @@
+import i18n from '../locales/i18n';
+
 /// <summary>
 /// Provides input validation and sanitization for user-supplied data.
 /// Prevents XSS-adjacent issues and enforces reasonable length limits.
@@ -65,11 +67,11 @@ export class InputValidator {
   /// </summary>
   static validateCardTitle(title: string): { valid: boolean; error?: string } {
     if (!title || !title.trim()) {
-      return { valid: false, error: 'Title is required' };
+      return { valid: false, error: i18n.t('validation.titleRequired') };
     }
 
     if (title.trim().length > 200) {
-      return { valid: false, error: 'Title must be 200 characters or less' };
+      return { valid: false, error: i18n.t('validation.titleTooLong') };
     }
 
     return { valid: true };
@@ -80,11 +82,11 @@ export class InputValidator {
   /// </summary>
   static validateColumnName(name: string): { valid: boolean; error?: string } {
     if (!name || !name.trim()) {
-      return { valid: false, error: 'Column name is required' };
+      return { valid: false, error: i18n.t('validation.columnNameRequired') };
     }
 
     if (name.trim().length > 50) {
-      return { valid: false, error: 'Column name must be 50 characters or less' };
+      return { valid: false, error: i18n.t('validation.columnNameTooLong') };
     }
 
     return { valid: true };
@@ -95,11 +97,11 @@ export class InputValidator {
   /// </summary>
   static validateTagName(tag: string): { valid: boolean; error?: string } {
     if (!tag || !tag.trim()) {
-      return { valid: false, error: 'Tag name is required' };
+      return { valid: false, error: i18n.t('validation.tagRequired') };
     }
 
     if (tag.trim().length > 30) {
-      return { valid: false, error: 'Tag must be 30 characters or less' };
+      return { valid: false, error: i18n.t('validation.tagTooLong') };
     }
 
     return { valid: true };
@@ -110,7 +112,7 @@ export class InputValidator {
   /// </summary>
   static validateDescription(description: string): { valid: boolean; error?: string } {
     if (description && description.length > 2000) {
-      return { valid: false, error: 'Description must be 2000 characters or less' };
+      return { valid: false, error: i18n.t('validation.descriptionTooLong') };
     }
 
     return { valid: true };

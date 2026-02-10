@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { TagDistributionData } from '../../types/board';
 
@@ -8,10 +9,12 @@ interface TagDistributionChartProps {
 const COLORS = ['#6366F1', '#EC4899', '#14B8A6', '#F59E0B', '#8B5CF6'];
 
 export function TagDistributionChart({ data }: TagDistributionChartProps) {
+  const { t } = useTranslation();
+
   if (data.length === 0) {
     return (
-      <div className="w-full h-64 flex items-center justify-center text-gray-500">
-        No tag data available
+      <div className="w-full h-64 flex items-center justify-center text-[var(--color-text-tertiary)]">
+        {t('dashboard.noTagData')}
       </div>
     );
   }

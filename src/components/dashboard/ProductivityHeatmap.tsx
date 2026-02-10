@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DailyCompletionData } from '../../types/board';
 import { format, parseISO, startOfWeek, addDays } from 'date-fns';
+import { getDateLocale } from '../../utils/dateFnsLocale';
 
 interface ProductivityHeatmapProps {
   data: DailyCompletionData[];
 }
 
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// Day labels are generated dynamically from date-fns locale in the component
 
 /// <summary>
 /// Determines the heatmap color intensity based on task completion count.
@@ -26,7 +28,15 @@ function getColorForCount(count: number): string {
 }
 
 export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
+  const { t } = useTranslation();
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+
+  // Locale-aware day abbreviations for the heatmap y-axis
+  const daysOfWeek = useMemo(() => {
+    const locale = getDateLocale();
+    const sunday = startOfWeek(new Date(), { weekStartsOn: 0 });
+    return Array.from({ length: 7 }, (_, i) => format(addDays(sunday, i), 'EEE', { locale }));
+  }, []);
 
   const grid = useMemo(() => {
     if (data.length === 0) return [];
@@ -70,7 +80,7 @@ export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
   if (data.length === 0) {
     return (
       <div className="w-full h-64 flex items-center justify-center text-[var(--color-text-tertiary)]">
-        <p className="text-sm">No data available for this period</p>
+        <p className="text-sm">{t('dashboard.noHeatmapData')}</p>
       </div>
     );
   }
@@ -80,7 +90,7 @@ export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
       <div className="flex gap-1">
         {/* Day labels */}
         <div className="flex flex-col gap-1 pr-2 pt-0">
-          {DAYS_OF_WEEK.map((day, i) => (
+          {daysOfWeek.map((day, i) => (
             <div
               key={day}
               className="h-4 flex items-center text-[10px] text-[var(--color-text-tertiary)]"
@@ -106,7 +116,7 @@ export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
                     if (day.count >= 0) {
                       const rect = e.currentTarget.getBoundingClientRect();
                       setTooltip({
-                        text: `${day.count} task${day.count !== 1 ? 's' : ''} completed on ${format(day.date, 'MMM d, yyyy')}`,
+                        text: t('dashboard.heatmapTooltip', { count: day.count, date: format(day.date, 'MMM d, yyyy', { locale: getDateLocale() }) }),
                         x: rect.left + rect.width / 2,
                         y: rect.top - 8,
                       });
@@ -122,7 +132,7 @@ export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
 
       {/* Legend */}
       <div className="flex items-center gap-2 mt-4 text-xs text-[var(--color-text-tertiary)]">
-        <span>Less</span>
+        <span>{t('common.less')}</span>
         {[0, 1, 2, 4, 5].map((count) => (
           <div
             key={count}
@@ -130,7 +140,7 @@ export function ProductivityHeatmap({ data }: ProductivityHeatmapProps) {
             style={{ backgroundColor: getColorForCount(count) }}
           />
         ))}
-        <span>More</span>
+        <span>{t('common.more')}</span>
       </div>
 
       {/* Tooltip */}
