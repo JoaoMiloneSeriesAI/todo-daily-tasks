@@ -16,6 +16,9 @@ export interface ElectronAPI {
   fetchHolidays: (params: { countryCode: string; year: number; languageCode?: string }) => Promise<Holiday[]>;
   fetchCountries: () => Promise<Country[]>;
 
+  // Open URL in default browser
+  openExternal: (url: string) => Promise<void>;
+
   // Clear all data
   clearAllData: () => Promise<void>;
 

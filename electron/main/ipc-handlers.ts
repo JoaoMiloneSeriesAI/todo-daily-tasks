@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { DataService } from './services/dataService';
 import { HolidayService } from './services/holidayService';
@@ -72,6 +72,17 @@ export function setupIpcHandlers() {
     } catch (error) {
       log.error('Error fetching countries:', error);
       throw error;
+    }
+  });
+
+  // Open URL in default browser
+  ipcMain.handle('open-external', async (_, url: string) => {
+    try {
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        await shell.openExternal(url);
+      }
+    } catch (error) {
+      log.error('Error opening external URL:', error);
     }
   });
 

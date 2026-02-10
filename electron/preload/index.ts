@@ -17,6 +17,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('fetch-holidays', params),
   fetchCountries: () => ipcRenderer.invoke('fetch-countries'),
 
+  // Open URL in default browser
+  openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
+
   // Clear all data
   clearAllData: () => ipcRenderer.invoke('clear-all-data'),
 

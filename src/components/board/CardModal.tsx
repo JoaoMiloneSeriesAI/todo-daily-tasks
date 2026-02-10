@@ -17,6 +17,44 @@ function hexToRgba(hex: string | null | undefined, alpha: number): string | unde
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+/// <summary>
+/// Renders a text string with URLs highlighted as clickable links.
+/// Non-URL text is rendered as plain spans preserving whitespace and newlines.
+/// </summary>
+function renderTextWithLinks(text: string): React.ReactNode[] {
+  const urlPattern = /(https?:\/\/[^\s]+)/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = urlPattern.exec(text)) !== null) {
+    // Text before the URL
+    if (match.index > lastIndex) {
+      parts.push(<span key={`t-${lastIndex}`}>{text.slice(lastIndex, match.index)}</span>);
+    }
+    // The URL itself
+    const url = match[0];
+    parts.push(
+      <a
+        key={`u-${match.index}`}
+        href={url}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.electronAPI?.openExternal(url); }}
+        className="text-[var(--color-accent)] underline hover:opacity-80 cursor-pointer"
+      >
+        {url}
+      </a>
+    );
+    lastIndex = urlPattern.lastIndex;
+  }
+
+  // Remaining text after the last URL
+  if (lastIndex < text.length) {
+    parts.push(<span key={`t-${lastIndex}`}>{text.slice(lastIndex)}</span>);
+  }
+
+  return parts.length > 0 ? parts : [<span key="empty">{text}</span>];
+}
+
 const COLOR_PALETTE = [
   '#6366F1', '#EC4899', '#14B8A6', '#F59E0B',
   '#8B5CF6', '#10B981', '#EF4444', '#3B82F6',
@@ -51,6 +89,8 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
   const [showColorPicker, setShowColorPicker] = useState(false);
   // Preview color for view mode: tracks live preview while picker is open
   const [previewColor, setPreviewColor] = useState<string | null>(null);
+  // Description read/edit toggle for view mode (links are clickable in read mode)
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
 
   useEffect(() => {
     if (card) {
@@ -71,6 +111,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
     setShowAddChecklist(false);
     setShowColorPicker(false);
     setPreviewColor(null);
+    setIsEditingDescription(false);
   }, [card, isOpen]);
 
   // Template auto-fill for new cards
@@ -262,15 +303,29 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
             </div>
           )}
 
-          {/* Description — inline editable */}
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            onBlur={handleInlineSave}
-            placeholder={t('card.descriptionPlaceholder')}
-            className="w-full text-sm text-[var(--color-text-secondary)] leading-relaxed bg-transparent border-0 outline-none focus:bg-[var(--color-input-bg)] focus:ring-2 focus:ring-[var(--color-accent-ring)] rounded-lg px-2 py-1 -mx-2 transition-all resize-none card-description"
-            rows={description ? Math.min(description.split('\n').length + 1, 8) : 2}
-          />
+          {/* Description — read mode shows clickable links, click to edit */}
+          {isEditingDescription ? (
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onBlur={() => { handleInlineSave(); setIsEditingDescription(false); }}
+              placeholder={t('card.descriptionPlaceholder')}
+              autoFocus
+              className="w-full text-sm text-[var(--color-text-secondary)] leading-relaxed bg-transparent border-0 outline-none focus:bg-[var(--color-input-bg)] focus:ring-2 focus:ring-[var(--color-accent-ring)] rounded-lg px-2 py-1 -mx-2 transition-all resize-none card-description"
+              rows={description ? Math.min(description.split('\n').length + 1, 8) : 3}
+            />
+          ) : (
+            <div
+              onClick={() => setIsEditingDescription(true)}
+              className="w-full text-sm leading-relaxed rounded-lg px-2 py-1 -mx-2 cursor-text hover:bg-[var(--color-input-bg)] transition-all whitespace-pre-wrap"
+            >
+              {description ? (
+                <span className="text-[var(--color-text-secondary)]">{renderTextWithLinks(description)}</span>
+              ) : (
+                <span className="text-[var(--color-text-tertiary)]">{t('card.descriptionPlaceholder')}</span>
+              )}
+            </div>
+          )}
 
           {/* Tags — toggle picker */}
           {renderTagPicker()}
