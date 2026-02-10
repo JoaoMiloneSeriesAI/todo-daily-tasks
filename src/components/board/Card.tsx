@@ -5,7 +5,7 @@ import { CSS } from '@dnd-kit/utilities';
 // framer-motion removed from menu — portal uses plain div for reliable clicks
 import { Card as CardType } from '../../types/card';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { MoreVertical, CheckSquare, BarChart2, Edit, Trash2, Copy, ArrowRightCircle } from 'lucide-react';
+import { MoreVertical, CheckSquare, BarChart2, Edit, Trash2, Copy, ArrowRightCircle, ArrowLeftCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 
@@ -16,6 +16,7 @@ interface CardProps {
   onDuplicate: (cardId: string) => void;
   onViewStats: (card: CardType) => void;
   onMoveToNextDay?: () => void;
+  onMoveToPreviousDay?: () => void;
 }
 
 /// <summary>
@@ -30,7 +31,7 @@ function hexToRgba(hex: string | null | undefined, alpha: number): string | unde
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, onViewStats, onMoveToNextDay }: CardProps) {
+export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, onViewStats, onMoveToNextDay, onMoveToPreviousDay }: CardProps) {
   const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
@@ -131,11 +132,11 @@ export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, on
           ${isDragging ? 'opacity-50 shadow-lg rotate-2' : 'opacity-100'}
         `}
       >
-        {/* Template color bar — Trello style */}
-        {template && (
+        {/* Color bar — card color overrides template color */}
+        {(card.color || template?.color) && (
           <div
             className="h-2 w-full"
-            style={{ backgroundColor: template.color }}
+            style={{ backgroundColor: card.color || template?.color }}
           />
         )}
 
@@ -232,6 +233,12 @@ export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, on
               <button onClick={() => { onMoveToNextDay(); setShowMenu(false); }}
                 className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] flex items-center gap-2">
                 <ArrowRightCircle size={16} /> {t('card.moveToNextDay')}
+              </button>
+            )}
+            {onMoveToPreviousDay && (
+              <button onClick={() => { onMoveToPreviousDay(); setShowMenu(false); }}
+                className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] flex items-center gap-2">
+                <ArrowLeftCircle size={16} /> {t('card.moveToPreviousDay')}
               </button>
             )}
             <div className="border-t border-[var(--color-border)] my-1" />

@@ -64,6 +64,22 @@ export function getNextWorkDay(currentDate: Date, workDaysSettings: WorkDaysSett
 }
 
 /**
+ * Get previous work day based on settings
+ */
+export function getPreviousWorkDay(currentDate: Date, workDaysSettings: WorkDaysSettings): Date {
+  let prevDate = new Date(currentDate);
+  prevDate.setDate(prevDate.getDate() - 1);
+
+  let attempts = 0;
+  while (!isWorkDay(prevDate, workDaysSettings) && attempts < 7) {
+    prevDate.setDate(prevDate.getDate() - 1);
+    attempts++;
+  }
+
+  return prevDate;
+}
+
+/**
  * Convert date to YYYY-MM-DD format for storage
  */
 export function dateToKey(date: Date): string {

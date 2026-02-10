@@ -19,6 +19,7 @@ interface ColumnProps {
   onRenameColumn?: (name: string) => void;
   onDeleteColumn?: () => void;
   onMoveCardToNextDay?: (cardId: string) => void;
+  onMoveCardToPreviousDay?: (cardId: string) => void;
 }
 
 export const Column = memo(function Column({
@@ -32,6 +33,7 @@ export const Column = memo(function Column({
   onRenameColumn,
   onDeleteColumn,
   onMoveCardToNextDay,
+  onMoveCardToPreviousDay,
 }: ColumnProps) {
   const { t } = useTranslation();
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
@@ -129,6 +131,7 @@ export const Column = memo(function Column({
               onDuplicate={onDuplicateCard}
               onViewStats={onViewStats}
               onMoveToNextDay={onMoveCardToNextDay ? () => onMoveCardToNextDay(card.id) : undefined}
+              onMoveToPreviousDay={onMoveCardToPreviousDay ? () => onMoveCardToPreviousDay(card.id) : undefined}
             />
           ))}
         </SortableContext>

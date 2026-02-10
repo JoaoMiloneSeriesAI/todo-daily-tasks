@@ -4,11 +4,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Modal, Input, Select, Button, ConfirmDialog } from '../shared';
 import { Card, ChecklistItem } from '../../types/card';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { X, Plus, Trash2, ArrowRightCircle, Edit, Copy, CheckSquare, Check } from 'lucide-react';
+import { X, Plus, Trash2, ArrowRightCircle, ArrowLeftCircle, Copy, CheckSquare, Check, Palette } from 'lucide-react';
 
 /// <summary>
 /// Converts a hex color to an rgba string with a given alpha.
-/// Handles 6-char hex safely; returns undefined for invalid input.
 /// </summary>
 function hexToRgba(hex: string | null | undefined, alpha: number): string | undefined {
   if (!hex || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return undefined;
@@ -18,6 +17,11 @@ function hexToRgba(hex: string | null | undefined, alpha: number): string | unde
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+const COLOR_PALETTE = [
+  '#6366F1', '#EC4899', '#14B8A6', '#F59E0B',
+  '#8B5CF6', '#10B981', '#EF4444', '#3B82F6',
+];
+
 interface CardModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -25,15 +29,15 @@ interface CardModalProps {
   card?: Card;
   columnId: string;
   onMoveToNextDay?: () => void;
+  onMoveToPreviousDay?: () => void;
   onDuplicate?: () => void;
   onDelete?: () => void;
 }
 
-export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNextDay, onDuplicate, onDelete }: CardModalProps) {
+export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNextDay, onMoveToPreviousDay, onDuplicate, onDelete }: CardModalProps) {
   const { t } = useTranslation();
   const { templates, getTemplateById, settings } = useSettingsStore();
   const globalTags = settings.tags || [];
-  const [mode, setMode] = useState<'view' | 'edit'>('edit');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [templateId, setTemplateId] = useState('');
@@ -43,6 +47,10 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
   const [showAddChecklist, setShowAddChecklist] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [cardColor, setCardColor] = useState<string>('');
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  // Preview color for view mode: tracks live preview while picker is open
+  const [previewColor, setPreviewColor] = useState<string | null>(null);
 
   useEffect(() => {
     if (card) {
@@ -51,16 +59,18 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
       setTemplateId(card.templateId || '');
       setTags(card.tags);
       setChecklist(card.checklist);
-      setMode('view');
+      setCardColor(card.color || '');
     } else {
       setTitle('');
       setDescription('');
       setTemplateId('');
       setTags([]);
       setChecklist([]);
-      setMode('edit');
+      setCardColor('');
     }
     setShowAddChecklist(false);
+    setShowColorPicker(false);
+    setPreviewColor(null);
   }, [card, isOpen]);
 
   // Template auto-fill for new cards
@@ -70,33 +80,41 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
       if (tmpl) {
         if (!title) setTitle(tmpl.prefix);
         setTags((prev) => [...new Set([...prev, ...tmpl.defaultTags])]);
+        setCardColor(tmpl.color);
       }
     }
   }, [templateId]);
 
   const handleSave = () => {
     if (!title.trim()) return;
-    onSave({ title: title.trim(), description: description.trim(), templateId: templateId || undefined, tags, checklist, columnId });
+    onSave({
+      title: title.trim(),
+      description: description.trim(),
+      templateId: templateId || undefined,
+      tags,
+      checklist,
+      columnId,
+      color: cardColor || undefined,
+    });
     onClose();
   };
 
   const handleInlineSave = () => {
     if (card && title.trim()) {
-      onSave({ ...card, title: title.trim(), description: description.trim(), tags, checklist });
-      // Show brief saved indicator
+      onSave({ ...card, title: title.trim(), description: description.trim(), tags, checklist, color: cardColor || undefined });
       setShowSaved(true);
       setTimeout(() => setShowSaved(false), 1200);
     }
   };
 
   const toggleTag = (tagName: string) => {
-    setTags((prev) => prev.includes(tagName) ? prev.filter((t) => t !== tagName) : [...prev, tagName]);
+    setTags((prev) => prev.includes(tagName) ? prev.filter((tg) => tg !== tagName) : [...prev, tagName]);
   };
 
   const handleToggleChecklistItem = (id: string) => {
     const updated = checklist.map((item) => item.id === id ? { ...item, isCompleted: !item.isCompleted } : item);
     setChecklist(updated);
-    if (mode === 'view' && card) {
+    if (card) {
       onSave({ ...card, checklist: updated });
     }
   };
@@ -112,8 +130,50 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
     }
   };
 
+  // View mode color picker: confirm commits, cancel reverts
+  const handleColorConfirm = () => {
+    if (previewColor !== null) {
+      setCardColor(previewColor);
+      if (card) {
+        onSave({ ...card, color: previewColor || undefined });
+        setShowSaved(true);
+        setTimeout(() => setShowSaved(false), 1200);
+      }
+    }
+    setPreviewColor(null);
+    setShowColorPicker(false);
+  };
+
+  const handleColorCancel = () => {
+    setPreviewColor(null);
+    setShowColorPicker(false);
+  };
+
   const template = templateId ? getTemplateById(templateId) : undefined;
   const completedItems = checklist.filter((item) => item.isCompleted).length;
+  // In view mode when picker is open, show the preview color; otherwise show committed color
+  const effectiveColor = (showColorPicker && previewColor !== null) ? (previewColor || template?.color) : (cardColor || template?.color);
+
+  // Color picker swatches — selectedColor controls which swatch is highlighted
+  const renderColorSwatches = (selectedColor: string, onSelect: (color: string) => void) => (
+    <div className="flex flex-wrap gap-2 items-center">
+      <button
+        onClick={() => onSelect('')}
+        className={`w-7 h-7 rounded-lg border-2 transition-all flex items-center justify-center ${!selectedColor ? 'border-[var(--color-text-primary)] scale-110' : 'border-[var(--color-border)] hover:scale-105'}`}
+        title={t('card.noColor')}
+      >
+        <X size={12} className="text-[var(--color-text-tertiary)]" />
+      </button>
+      {COLOR_PALETTE.map((color) => (
+        <button
+          key={color}
+          onClick={() => onSelect(color)}
+          className={`w-7 h-7 rounded-lg transition-all ${selectedColor === color ? 'ring-2 ring-offset-2 ring-[var(--color-accent)] scale-110' : 'hover:scale-105'}`}
+          style={{ backgroundColor: color }}
+        />
+      ))}
+    </div>
+  );
 
   // Tag picker — shows all global tags as toggleable colored badges
   const renderTagPicker = () => (
@@ -125,7 +185,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
           return (
             <button
               key={td.id}
-              onClick={() => toggleTag(td.name)}
+              onClick={() => { toggleTag(td.name); if (card) handleInlineSave(); }}
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all border-2 ${
                 isSelected ? 'border-current' : 'border-transparent opacity-60 hover:opacity-100'
               }`}
@@ -139,32 +199,45 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
     </div>
   );
 
-  // VIEW MODE — inline-editable display
-  if (mode === 'view' && card) {
+  // VIEW MODE — inline-editable display (for existing cards)
+  if (card) {
+    const pickerColor = previewColor !== null ? previewColor : cardColor;
+
     return (
       <Modal
         isOpen={isOpen}
         onClose={() => { handleInlineSave(); onClose(); }}
         title={title || t('card.editCard')}
         size="lg"
-        headerColor={template?.color}
+        headerColor={effectiveColor}
         headerContent={
           <div className="flex items-center gap-2">
+            {/* Color dot — click to toggle color picker */}
+            <button
+              onClick={() => {
+                if (showColorPicker) {
+                  handleColorCancel();
+                } else {
+                  setPreviewColor(cardColor);
+                  setShowColorPicker(true);
+                }
+              }}
+              className="w-6 h-6 rounded-full border-2 border-[var(--color-border)] flex-shrink-0 hover:scale-110 transition-all"
+              style={{ backgroundColor: effectiveColor || 'var(--color-bg-tertiary)' }}
+              title={t('card.color')}
+            >
+              {!effectiveColor && <Palette size={12} className="text-[var(--color-text-tertiary)] mx-auto" />}
+            </button>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onBlur={handleInlineSave}
               className="w-full text-xl font-bold bg-transparent border-0 outline-none focus:bg-[var(--color-input-bg)] focus:ring-2 focus:ring-[var(--color-accent-ring)] rounded-lg px-2 py-1 -mx-2 transition-all card-title-input"
-              style={{ color: template?.color || 'var(--color-text-primary)' }}
+              style={{ color: effectiveColor || 'var(--color-text-primary)' }}
             />
             <AnimatePresence>
               {showSaved && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex items-center gap-1 text-xs text-green-600 whitespace-nowrap flex-shrink-0"
-                >
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-1 text-xs text-green-600 whitespace-nowrap flex-shrink-0">
                   <Check size={12} /> {t('common.saved')}
                 </motion.div>
               )}
@@ -173,6 +246,22 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
         }
       >
         <div className="space-y-4">
+          {/* Inline color picker with Confirm/Cancel */}
+          {showColorPicker && (
+            <div className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg space-y-3">
+              <label className="block text-xs font-medium text-[var(--color-text-secondary)]">{t('card.color')}</label>
+              {renderColorSwatches(pickerColor, (color) => setPreviewColor(color))}
+              <div className="flex gap-2 pt-1">
+                <Button variant="primary" size="sm" onClick={handleColorConfirm}>
+                  <Check size={14} className="mr-1" /> {t('card.colorConfirm')}
+                </Button>
+                <Button variant="secondary" size="sm" onClick={handleColorCancel}>
+                  {t('card.colorCancel')}
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Description — inline editable */}
           <textarea
             value={description}
@@ -210,21 +299,9 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
               <div className="space-y-1">
                 {checklist.map((item) => (
                   <div key={item.id} className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-[var(--color-surface-hover)] group">
-                    <input
-                      type="checkbox"
-                      checked={item.isCompleted}
-                      onChange={() => handleToggleChecklistItem(item.id)}
-                      className="w-4 h-4 text-[var(--color-accent)] rounded"
-                    />
-                    <span className={`flex-1 text-sm ${item.isCompleted ? 'line-through text-[var(--color-text-tertiary)]' : 'text-[var(--color-text-primary)]'}`}>
-                      {item.text}
-                    </span>
-                    <button
-                      onClick={() => { handleRemoveChecklistItem(item.id); handleInlineSave(); }}
-                      className="p-1 opacity-0 group-hover:opacity-100 hover:text-red-500 rounded transition-all"
-                    >
-                      <Trash2 size={12} />
-                    </button>
+                    <input type="checkbox" checked={item.isCompleted} onChange={() => handleToggleChecklistItem(item.id)} className="w-4 h-4 text-[var(--color-accent)] rounded" />
+                    <span className={`flex-1 text-sm ${item.isCompleted ? 'line-through text-[var(--color-text-tertiary)]' : 'text-[var(--color-text-primary)]'}`}>{item.text}</span>
+                    <button onClick={() => { handleRemoveChecklistItem(item.id); handleInlineSave(); }} className="p-1 opacity-0 group-hover:opacity-100 hover:text-red-500 rounded transition-all"><Trash2 size={12} /></button>
                   </div>
                 ))}
               </div>
@@ -234,23 +311,15 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
           {/* Add checklist item inline */}
           {showAddChecklist ? (
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={checklistInput}
-                onChange={(e) => setChecklistInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { handleAddChecklistItem(); } if (e.key === 'Escape') setShowAddChecklist(false); }}
-                placeholder={t('card.addChecklistItem')}
-                autoFocus
-                className="flex-1 px-3 py-1.5 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm"
-              />
+              <input type="text" value={checklistInput} onChange={(e) => setChecklistInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleAddChecklistItem(); if (e.key === 'Escape') setShowAddChecklist(false); }}
+                placeholder={t('card.addChecklistItem')} autoFocus
+                className="flex-1 px-3 py-1.5 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm" />
               <Button variant="secondary" size="sm" onClick={handleAddChecklistItem}><Plus size={14} /></Button>
               <Button variant="secondary" size="sm" onClick={() => setShowAddChecklist(false)}><X size={14} /></Button>
             </div>
           ) : (
-            <button
-              onClick={() => setShowAddChecklist(true)}
-              className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors flex items-center gap-1"
-            >
+            <button onClick={() => setShowAddChecklist(true)} className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors flex items-center gap-1">
               <Plus size={12} /> {t('card.addChecklistItem')}
             </button>
           )}
@@ -258,9 +327,11 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
           {/* Actions */}
           <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
             <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" size="sm" onClick={() => setMode('edit')}>
-                <Edit size={14} className="mr-1" /> {t('card.edit')}
-              </Button>
+              {onMoveToPreviousDay && (
+                <Button variant="secondary" size="sm" onClick={() => { handleInlineSave(); onMoveToPreviousDay(); onClose(); }}>
+                  <ArrowLeftCircle size={14} className="mr-1" /> {t('card.moveToPreviousDay')}
+                </Button>
+              )}
               {onMoveToNextDay && (
                 <Button variant="secondary" size="sm" onClick={() => { handleInlineSave(); onMoveToNextDay(); onClose(); }}>
                   <ArrowRightCircle size={14} className="mr-1" /> {t('card.moveToNextDay')}
@@ -279,7 +350,6 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
             )}
           </div>
 
-          {/* Delete Confirmation Dialog */}
           <ConfirmDialog
             isOpen={showDeleteConfirm}
             onClose={() => setShowDeleteConfirm(false)}
@@ -295,21 +365,49 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
     );
   }
 
-  // EDIT MODE — full form
+  // CREATE MODE — full form (only for new cards)
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={card ? t('card.editCard') : t('card.newCard')} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('card.newCard')} size="lg" headerColor={effectiveColor}>
       <div className="space-y-4">
-        {!card && (
-          <Select
-            label={t('card.template')}
-            value={templateId}
-            onChange={(e) => setTemplateId(e.target.value)}
-            options={[
-              { value: '', label: t('card.noTemplate') },
-              ...templates.map((tmpl) => ({ value: tmpl.id, label: `${tmpl.prefix} ${tmpl.name}` })),
-            ]}
-          />
-        )}
+        {/* Live card preview */}
+        <div>
+          <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">{t('card.preview')}</label>
+          <div className="bg-[var(--color-surface)] rounded-lg shadow-sm border border-[var(--color-border)] overflow-hidden max-w-[250px]">
+            {effectiveColor && <div className="h-2 w-full" style={{ backgroundColor: effectiveColor }} />}
+            <div className="p-3">
+              <p className="font-semibold text-sm text-[var(--color-text-primary)] truncate">
+                {title || t('card.titlePlaceholder')}
+              </p>
+              {description && (
+                <p className="text-xs text-[var(--color-text-secondary)] mt-1 truncate">{description}</p>
+              )}
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {tags.slice(0, 3).map((tag) => {
+                    const td = globalTags.find((g) => g.name === tag);
+                    return (
+                      <span key={tag} className="px-1.5 py-0.5 text-[9px] font-semibold rounded-full"
+                        style={td ? { backgroundColor: hexToRgba(td.color, 0.12), color: td.color } : undefined}>
+                        {tag}
+                      </span>
+                    );
+                  })}
+                  {tags.length > 3 && <span className="text-[9px] text-[var(--color-text-tertiary)]">+{tags.length - 3}</span>}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <Select
+          label={t('card.template')}
+          value={templateId}
+          onChange={(e) => setTemplateId(e.target.value)}
+          options={[
+            { value: '', label: t('card.noTemplate') },
+            ...templates.map((tmpl) => ({ value: tmpl.id, label: `${tmpl.prefix} ${tmpl.name}` })),
+          ]}
+        />
 
         <Input label={t('card.title')} required value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t('card.titlePlaceholder')} />
 
@@ -324,6 +422,12 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
           />
         </div>
 
+        {/* Card color picker */}
+        <div>
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">{t('card.color')}</label>
+          {renderColorSwatches(cardColor, (color) => setCardColor(color))}
+        </div>
+
         {/* Tag picker */}
         {renderTagPicker()}
 
@@ -331,14 +435,10 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
         <div>
           <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">{t('card.checklist')}</label>
           <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={checklistInput}
-              onChange={(e) => setChecklistInput(e.target.value)}
+            <input type="text" value={checklistInput} onChange={(e) => setChecklistInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddChecklistItem()}
               placeholder={t('card.addChecklistItem')}
-              className="flex-1 px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm"
-            />
+              className="flex-1 px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm" />
             <Button variant="secondary" size="sm" onClick={handleAddChecklistItem}><Plus size={16} /></Button>
           </div>
           <div className="space-y-2">
@@ -346,23 +446,16 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
               <div key={item.id} className="flex items-center gap-2 p-2 bg-[var(--color-bg-tertiary)] rounded-lg">
                 <input type="checkbox" checked={item.isCompleted} onChange={() => handleToggleChecklistItem(item.id)} className="w-4 h-4 text-[var(--color-accent)] rounded" />
                 <span className={`flex-1 text-sm ${item.isCompleted ? 'line-through text-[var(--color-text-tertiary)]' : 'text-[var(--color-text-primary)]'}`}>{item.text}</span>
-                <button onClick={() => handleRemoveChecklistItem(item.id)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 rounded transition-colors">
-                  <Trash2 size={14} />
-                </button>
+                <button onClick={() => handleRemoveChecklistItem(item.id)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 rounded transition-colors"><Trash2 size={14} /></button>
               </div>
             ))}
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 justify-between pt-4 border-t border-[var(--color-border)]">
-          <div>
-            {card && <Button variant="secondary" size="sm" onClick={() => setMode('view')}>{t('common.close')}</Button>}
-          </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
-            <Button variant="primary" onClick={handleSave}>{card ? t('card.saveChanges') : t('card.createCard')}</Button>
-          </div>
+        <div className="flex gap-2 justify-end pt-4 border-t border-[var(--color-border)]">
+          <Button variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
+          <Button variant="primary" onClick={handleSave}>{t('card.createCard')}</Button>
         </div>
       </div>
     </Modal>

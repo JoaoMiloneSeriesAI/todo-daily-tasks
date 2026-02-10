@@ -82,6 +82,12 @@
     "duplicate": "Duplicate",
     "viewStats": "View Stats",
     "moveToNextDay": "Move to Next Day",
+    "moveToPreviousDay": "Move to Previous Day",
+    "color": "Card Color",
+    "noColor": "No color",
+    "colorConfirm": "Confirm",
+    "colorCancel": "Cancel",
+    "preview": "Preview",
     "saveChanges": "Save Changes",
     "createCard": "Create Card",
     "deleteConfirm": "Are you sure you want to delete this card?"

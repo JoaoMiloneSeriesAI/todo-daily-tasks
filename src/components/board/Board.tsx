@@ -190,6 +190,11 @@ export function Board({ selectedDate, onBack }: BoardProps) {
     await moveCardToDate(cardId, selectedDate);
   };
 
+  const handleMoveCardToPreviousDay = async (cardId: string) => {
+    const { moveCardToPreviousDate } = useBoardStore.getState();
+    await moveCardToPreviousDate(cardId, selectedDate);
+  };
+
   return (
     <div className="h-full flex flex-col">
       {/* Board Header */}
@@ -249,6 +254,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
                   onRenameColumn={(name) => handleRenameColumn(column.id, name)}
                   onDeleteColumn={() => setDeleteColumnId(column.id)}
                   onMoveCardToNextDay={handleMoveCardToNextDay}
+                  onMoveCardToPreviousDay={handleMoveCardToPreviousDay}
                 />
               ))}
 
@@ -293,6 +299,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
         card={editingCard}
         columnId={selectedColumnId}
         onMoveToNextDay={editingCard ? () => handleMoveCardToNextDay(editingCard.id) : undefined}
+        onMoveToPreviousDay={editingCard ? () => handleMoveCardToPreviousDay(editingCard.id) : undefined}
         onDuplicate={editingCard ? () => duplicateCard(editingCard.id) : undefined}
         onDelete={editingCard ? () => deleteCard(editingCard.id) : undefined}
       />

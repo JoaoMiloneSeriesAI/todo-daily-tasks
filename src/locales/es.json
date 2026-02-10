@@ -82,6 +82,12 @@
     "duplicate": "Duplicar",
     "viewStats": "Ver Estadísticas",
     "moveToNextDay": "Mover al Siguiente Día",
+    "moveToPreviousDay": "Mover al Día Anterior",
+    "color": "Color del Cartão",
+    "noColor": "Sin color",
+    "colorConfirm": "Confirmar",
+    "colorCancel": "Cancelar",
+    "preview": "Vista previa",
     "saveChanges": "Guardar Cambios",
     "createCard": "Crear Tarjeta",
     "deleteConfirm": "¿Estás seguro de que quieres eliminar esta tarjeta?"

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { Card, CardMovement, MigrationOption } from '../types/card';
 import { Column, COLUMN_IDS } from '../types/column';
 import { format } from 'date-fns';
-import { getNextWorkDay } from '../utils/dateHelpers';
+import { getNextWorkDay, getPreviousWorkDay } from '../utils/dateHelpers';
 import { useSettingsStore } from './settingsStore';
 import { ipcService } from '../services/ipcService';
 import i18n from '../locales/i18n';
@@ -34,6 +34,7 @@ interface BoardStore {
   deleteCard: (cardId: string) => void;
   duplicateCard: (cardId: string) => void;
   moveCardToDate: (cardId: string, currentDate: Date) => Promise<void>;
+  moveCardToPreviousDate: (cardId: string, currentDate: Date) => Promise<void>;
 
   // Data persistence
   setSelectedDate: (date: Date) => void;
@@ -277,6 +278,50 @@ export const useBoardStore = create<BoardStore>((set, get) => ({
       get().saveBoardData();
     } catch (error) {
       console.error('Error moving card to next day:', error);
+    }
+  },
+
+  moveCardToPreviousDate: async (cardId, currentDate) => {
+    const { cards } = get();
+    const card = cards.find((c) => c.id === cardId);
+    if (!card) return;
+
+    const settingsState = useSettingsStore.getState();
+    const targetDate = getPreviousWorkDay(currentDate, settingsState.settings.workDays);
+    const targetDateKey = format(targetDate, 'yyyy-MM-dd');
+
+    try {
+      const targetBoard = await ipcService.loadBoard(targetDateKey);
+      const targetCards: Card[] = (targetBoard as any)?._cards || [];
+      const targetColumns: Column[] = (targetBoard as any)?.columns || getDefaultColumns();
+
+      const movedCard: Card = {
+        ...card,
+        columnId: COLUMN_IDS.TODO,
+        movementHistory: [
+          ...card.movementHistory,
+          {
+            id: crypto.randomUUID(),
+            fromColumnId: card.columnId,
+            toColumnId: COLUMN_IDS.TODO,
+            timestamp: new Date(),
+          },
+        ],
+      };
+
+      await ipcService.saveBoard(targetDateKey, {
+        date: targetDateKey,
+        columns: targetColumns,
+        metadata: { lastModified: new Date(), version: '2.0' },
+        _cards: [...targetCards, movedCard],
+      });
+
+      set((state) => ({
+        cards: state.cards.filter((c) => c.id !== cardId),
+      }));
+      get().saveBoardData();
+    } catch (error) {
+      console.error('Error moving card to previous day:', error);
     }
   },
 

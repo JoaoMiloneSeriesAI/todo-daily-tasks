@@ -5,6 +5,7 @@ export interface Card {
   createdDate: Date;
   columnId: string;
   templateId?: string;
+  color?: string;
   tags: string[];
   checklist: ChecklistItem[];
   movementHistory: CardMovement[];
