@@ -56,7 +56,7 @@ function App() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const { t, i18n } = useTranslation();
-  const { loadSettings, settings } = useSettingsStore();
+  const { loadSettings, settings, isLoading: isSettingsLoading } = useSettingsStore();
   const { loadBoardForDate } = useBoardStore();
 
   // Initialize app
@@ -109,13 +109,21 @@ function App() {
   }, [settings.appearance.accentColor]);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
-  // Check if onboarding is needed
+  // Track when the initial settings load completes
   useEffect(() => {
-    if (!settings.hasCompletedOnboarding) {
+    if (!isSettingsLoading && !settingsLoaded) {
+      setSettingsLoaded(true);
+    }
+  }, [isSettingsLoading]);
+
+  // Check if onboarding is needed — only after settings have loaded from disk
+  useEffect(() => {
+    if (settingsLoaded && !settings.hasCompletedOnboarding) {
       setShowOnboarding(true);
     }
-  }, [settings.hasCompletedOnboarding]);
+  }, [settingsLoaded, settings.hasCompletedOnboarding]);
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);

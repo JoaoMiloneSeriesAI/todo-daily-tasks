@@ -54,7 +54,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       defaultTags: ['docs'],
     },
   ],
-  isLoading: false,
+  isLoading: true, // Start as true — becomes false after first loadSettings() completes
 
   // Settings operations
   loadSettings: async () => {

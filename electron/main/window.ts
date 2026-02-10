@@ -7,10 +7,10 @@ const __dirname = path.dirname(__filename);
 
 export function createMainWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
+    width: 1280,
+    height: 900,
+    minWidth: 900,
+    minHeight: 700,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,

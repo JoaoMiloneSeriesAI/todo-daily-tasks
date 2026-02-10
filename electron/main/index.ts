@@ -14,14 +14,9 @@ const __dirname = path.dirname(__filename);
 
 let mainWindow: BrowserWindow | null = null;
 
-function initialize() {
-  // Create main window
+function createWindow() {
   mainWindow = createMainWindow();
 
-  // Setup IPC handlers
-  setupIpcHandlers();
-
-  // Handle window closed
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -29,12 +24,15 @@ function initialize() {
 
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
-  initialize();
+  // Register IPC handlers once — must not be called again on re-activate
+  setupIpcHandlers();
+
+  createWindow();
 
   app.on('activate', () => {
     // On macOS it's common to re-create a window when dock icon is clicked
     if (BrowserWindow.getAllWindows().length === 0) {
-      initialize();
+      createWindow();
     }
   });
 });

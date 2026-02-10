@@ -89,4 +89,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
     enableSounds: true,
   },
   tags: DEFAULT_TAGS,
+  hasCompletedOnboarding: false,
 };
