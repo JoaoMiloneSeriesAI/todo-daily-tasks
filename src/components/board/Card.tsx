@@ -8,6 +8,7 @@ import { useSettingsStore } from '../../stores/settingsStore';
 import { MoreVertical, CheckSquare, BarChart2, Edit, Trash2, Copy, ArrowRightCircle, ArrowLeftCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
+import { renderFormattedDescription } from '../../utils/richText';
 
 interface CardProps {
   card: CardType;
@@ -165,11 +166,11 @@ export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, on
             </div>
           </div>
 
-          {/* Description */}
+          {/* Description — rendered with formatting and clickable links */}
           {card.description && (
-            <p className="text-xs text-[var(--color-text-secondary)] mb-3 line-clamp-2">
-              {card.description}
-            </p>
+            <div className="text-xs text-[var(--color-text-secondary)] mb-3 line-clamp-2">
+              {renderFormattedDescription(card.description)}
+            </div>
           )}
 
           {/* Tags — with colors from global tag definitions */}

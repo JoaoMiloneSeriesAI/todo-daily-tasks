@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Modal, Input, Select, Button, ConfirmDialog } from '../shared';
 import { Card, ChecklistItem } from '../../types/card';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { X, Plus, Trash2, ArrowRightCircle, ArrowLeftCircle, Copy, CheckSquare, Check, Palette } from 'lucide-react';
+import { X, Plus, Trash2, ArrowRightCircle, ArrowLeftCircle, Copy, CheckSquare, Check, Palette, Bold, Italic, Underline, Strikethrough, List, Code, Braces } from 'lucide-react';
+import { wrapSelection, insertBullet, insertCodeBlock, modKey, renderFormattedDescription, getActiveFormats, handleMarkerDeletion } from '../../utils/richText';
+import { RichTextEditor } from './RichTextEditor';
+import { Tooltip } from '../shared/Tooltip';
 
 /// <summary>
 /// Converts a hex color to an rgba string with a given alpha.
@@ -15,44 +18,6 @@ function hexToRgba(hex: string | null | undefined, alpha: number): string | unde
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-/// <summary>
-/// Renders a text string with URLs highlighted as clickable links.
-/// Non-URL text is rendered as plain spans preserving whitespace and newlines.
-/// </summary>
-function renderTextWithLinks(text: string): React.ReactNode[] {
-  const urlPattern = /(https?:\/\/[^\s]+)/g;
-  const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = urlPattern.exec(text)) !== null) {
-    // Text before the URL
-    if (match.index > lastIndex) {
-      parts.push(<span key={`t-${lastIndex}`}>{text.slice(lastIndex, match.index)}</span>);
-    }
-    // The URL itself
-    const url = match[0];
-    parts.push(
-      <a
-        key={`u-${match.index}`}
-        href={url}
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.electronAPI?.openExternal(url); }}
-        className="text-[var(--color-accent)] underline hover:opacity-80 cursor-pointer"
-      >
-        {url}
-      </a>
-    );
-    lastIndex = urlPattern.lastIndex;
-  }
-
-  // Remaining text after the last URL
-  if (lastIndex < text.length) {
-    parts.push(<span key={`t-${lastIndex}`}>{text.slice(lastIndex)}</span>);
-  }
-
-  return parts.length > 0 ? parts : [<span key="empty">{text}</span>];
 }
 
 const COLOR_PALETTE = [
@@ -91,6 +56,85 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
   const [previewColor, setPreviewColor] = useState<string | null>(null);
   // Description read/edit toggle for view mode (links are clickable in read mode)
   const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  // Tracks cursor position for toolbar active state highlighting
+  const [cursorPos, setCursorPos] = useState(0);
+  const activeFormats = description ? getActiveFormats(description, cursorPos) : new Set<string>();
+
+  // Update cursor position on selection/key/click events
+  const updateCursorPos = useCallback(() => {
+    if (descriptionRef.current) {
+      setCursorPos(descriptionRef.current.selectionStart);
+    }
+  }, []);
+
+  type FormatType = 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | 'codeblock' | 'bullet';
+
+  // Formatting toolbar action: wraps selection and updates description
+  const applyFormat = useCallback((type: FormatType) => {
+    const ta = descriptionRef.current;
+    if (!ta) return;
+    let result: { newText: string; cursorPos: number };
+    switch (type) {
+      case 'bold':
+        result = wrapSelection(ta, description, '*', '*');
+        break;
+      case 'italic':
+        result = wrapSelection(ta, description, '_', '_');
+        break;
+      case 'underline':
+        result = wrapSelection(ta, description, '~', '~');
+        break;
+      case 'strikethrough':
+        result = wrapSelection(ta, description, '~~', '~~');
+        break;
+      case 'code':
+        result = wrapSelection(ta, description, '`', '`');
+        break;
+      case 'codeblock':
+        result = insertCodeBlock(ta, description);
+        break;
+      case 'bullet':
+        result = insertBullet(ta, description);
+        break;
+    }
+    setDescription(result.newText);
+    requestAnimationFrame(() => {
+      ta.focus();
+      ta.setSelectionRange(result.cursorPos, result.cursorPos);
+      setCursorPos(result.cursorPos);
+    });
+  }, [description]);
+
+  // Keyboard shortcut handler for the description textarea
+  const handleDescriptionKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Marker protection: intercept Backspace/Delete near formatting markers
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      const ta = descriptionRef.current;
+      if (ta && ta.selectionStart === ta.selectionEnd) {
+        const result = handleMarkerDeletion(description, ta.selectionStart, e.key === 'Backspace');
+        if (result) {
+          e.preventDefault();
+          setDescription(result.newText);
+          requestAnimationFrame(() => {
+            ta.focus();
+            ta.setSelectionRange(result.cursorPos, result.cursorPos);
+            setCursorPos(result.cursorPos);
+          });
+          return;
+        }
+      }
+    }
+
+    // Formatting shortcuts
+    const mod = e.metaKey || e.ctrlKey;
+    if (!mod) return;
+    if (e.key === 'b') { e.preventDefault(); applyFormat('bold'); }
+    else if (e.key === 'i') { e.preventDefault(); applyFormat('italic'); }
+    else if (e.key === 'u') { e.preventDefault(); applyFormat('underline'); }
+    else if (e.key === 'e') { e.preventDefault(); applyFormat('code'); }
+    else if (e.key === 's') { e.preventDefault(); applyFormat('strikethrough'); }
+  }, [applyFormat, description]);
 
   useEffect(() => {
     if (card) {
@@ -286,7 +330,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
           </div>
         }
       >
-        <div className="space-y-4">
+        <div className="space-y-4 min-h-[400px]">
           {/* Inline color picker with Confirm/Cancel */}
           {showColorPicker && (
             <div className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg space-y-3">
@@ -303,24 +347,72 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
             </div>
           )}
 
-          {/* Description — read mode shows clickable links, click to edit */}
+          {/* Description — read mode shows formatted text with links, click to edit */}
           {isEditingDescription ? (
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              onBlur={() => { handleInlineSave(); setIsEditingDescription(false); }}
-              placeholder={t('card.descriptionPlaceholder')}
-              autoFocus
-              className="w-full text-sm text-[var(--color-text-secondary)] leading-relaxed bg-transparent border-0 outline-none focus:bg-[var(--color-input-bg)] focus:ring-2 focus:ring-[var(--color-accent-ring)] rounded-lg px-2 py-1 -mx-2 transition-all resize-none card-description"
-              rows={description ? Math.min(description.split('\n').length + 1, 8) : 3}
-            />
+            <div>
+              {/* Formatting toolbar — onMouseDown preventDefault keeps textarea focused */}
+              <div className="flex items-center gap-0.5 mb-1 px-1">
+                {([
+                  { format: 'bold' as FormatType, icon: Bold, tip: `Bold (${modKey()}+B)`, key: 'bold' },
+                  { format: 'italic' as FormatType, icon: Italic, tip: `Italic (${modKey()}+I)`, key: 'italic' },
+                  { format: 'underline' as FormatType, icon: Underline, tip: `Underline (${modKey()}+U)`, key: 'underline' },
+                  { format: 'strikethrough' as FormatType, icon: Strikethrough, tip: `Strikethrough (${modKey()}+S)`, key: 'strikethrough' },
+                ] as const).map(({ format, icon: Icon, tip, key }) => (
+                  <Tooltip key={key} text={tip}>
+                    <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat(format)}
+                      className={`p-1.5 rounded transition-colors ${
+                        activeFormats.has(key)
+                          ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)]'
+                          : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                      }`}>
+                      <Icon size={14} />
+                    </button>
+                  </Tooltip>
+                ))}
+                <div className="w-px h-4 bg-[var(--color-border)] mx-0.5" />
+                <Tooltip text={`Code (${modKey()}+E)`}>
+                  <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('code')}
+                    className={`p-1.5 rounded transition-colors ${
+                      activeFormats.has('code')
+                        ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)]'
+                        : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                    }`}>
+                    <Code size={14} />
+                  </button>
+                </Tooltip>
+                <Tooltip text="Code Block">
+                  <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('codeblock')}
+                    className="p-1.5 rounded hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
+                    <Braces size={14} />
+                  </button>
+                </Tooltip>
+                <div className="w-px h-4 bg-[var(--color-border)] mx-0.5" />
+                <Tooltip text="Bullet List">
+                  <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('bullet')}
+                    className="p-1.5 rounded hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
+                    <List size={14} />
+                  </button>
+                </Tooltip>
+              </div>
+              <RichTextEditor
+                value={description}
+                onChange={(val) => { setDescription(val); }}
+                onBlur={() => { handleInlineSave(); setIsEditingDescription(false); }}
+                placeholder={t('card.descriptionPlaceholder')}
+                textareaRef={descriptionRef}
+                onKeyDown={handleDescriptionKeyDown}
+                onCursorChange={updateCursorPos}
+                autoFocus
+                rows={6}
+              />
+            </div>
           ) : (
             <div
               onClick={() => setIsEditingDescription(true)}
-              className="w-full text-sm leading-relaxed rounded-lg px-2 py-1 -mx-2 cursor-text hover:bg-[var(--color-input-bg)] transition-all whitespace-pre-wrap"
+              className="w-full text-sm leading-relaxed rounded-lg px-2 py-1 -mx-2 cursor-text hover:bg-[var(--color-input-bg)] transition-all"
             >
               {description ? (
-                <span className="text-[var(--color-text-secondary)]">{renderTextWithLinks(description)}</span>
+                <div className="text-[var(--color-text-secondary)]">{renderFormattedDescription(description)}</div>
               ) : (
                 <span className="text-[var(--color-text-tertiary)]">{t('card.descriptionPlaceholder')}</span>
               )}
@@ -329,16 +421,6 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
 
           {/* Tags — toggle picker */}
           {renderTagPicker()}
-
-          {/* Template badge */}
-          {template && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[var(--color-text-tertiary)]">{t('card.template')}:</span>
-              <span className="text-xs font-medium px-2 py-1 rounded" style={{ backgroundColor: hexToRgba(template.color, 0.12) || template.color + '20', color: template.color }}>
-                {template.prefix} {template.name}
-              </span>
-            </div>
-          )}
 
           {/* Checklist — interactive with inline add */}
           {(checklist.length > 0 || showAddChecklist) && (
@@ -423,7 +505,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
   // CREATE MODE — full form (only for new cards)
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={t('card.newCard')} size="lg" headerColor={effectiveColor}>
-      <div className="space-y-4">
+      <div className="space-y-4 min-h-[400px]">
         {/* Live card preview */}
         <div>
           <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">{t('card.preview')}</label>
@@ -468,12 +550,58 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
 
         <div>
           <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">{t('card.description')}</label>
-          <textarea
+          {/* Formatting toolbar — onMouseDown preventDefault keeps textarea focused */}
+          <div className="flex items-center gap-0.5 mb-1">
+            {([
+              { format: 'bold' as FormatType, icon: Bold, tip: `Bold (${modKey()}+B)`, key: 'bold' },
+              { format: 'italic' as FormatType, icon: Italic, tip: `Italic (${modKey()}+I)`, key: 'italic' },
+              { format: 'underline' as FormatType, icon: Underline, tip: `Underline (${modKey()}+U)`, key: 'underline' },
+              { format: 'strikethrough' as FormatType, icon: Strikethrough, tip: `Strikethrough (${modKey()}+S)`, key: 'strikethrough' },
+            ] as const).map(({ format, icon: Icon, tip, key }) => (
+              <Tooltip key={key} text={tip}>
+                <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat(format)}
+                  className={`p-1.5 rounded transition-colors ${
+                    activeFormats.has(key)
+                      ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)]'
+                      : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                  }`}>
+                  <Icon size={14} />
+                </button>
+              </Tooltip>
+            ))}
+            <div className="w-px h-4 bg-[var(--color-border)] mx-0.5" />
+            <Tooltip text={`Code (${modKey()}+E)`}>
+              <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('code')}
+                className={`p-1.5 rounded transition-colors ${
+                  activeFormats.has('code')
+                    ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)]'
+                    : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                }`}>
+                <Code size={14} />
+              </button>
+            </Tooltip>
+            <Tooltip text="Code Block">
+              <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('codeblock')}
+                className="p-1.5 rounded hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
+                <Braces size={14} />
+              </button>
+            </Tooltip>
+            <div className="w-px h-4 bg-[var(--color-border)] mx-0.5" />
+            <Tooltip text="Bullet List">
+              <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('bullet')}
+                className="p-1.5 rounded hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
+                <List size={14} />
+              </button>
+            </Tooltip>
+          </div>
+          <RichTextEditor
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(val) => { setDescription(val); }}
             placeholder={t('card.descriptionPlaceholder')}
-            className="w-full px-4 py-2 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm focus:bg-[var(--color-input-focus-bg)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-ring)] transition-all duration-200"
-            rows={3}
+            textareaRef={descriptionRef}
+            onKeyDown={handleDescriptionKeyDown}
+            onCursorChange={updateCursorPos}
+            rows={6}
           />
         </div>
 

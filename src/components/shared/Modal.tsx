@@ -112,18 +112,18 @@ export function Modal({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — use onMouseDown to prevent drag-to-select from closing */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
             className="fixed inset-0 bg-[var(--color-overlay)] z-40"
             aria-hidden="true"
           />
 
-          {/* Modal */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+          {/* Modal wrapper — only close if mousedown directly on the wrapper, not bubbled from children */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
             <motion.div
               ref={modalRef}
               initial={{ scale: 0.95, opacity: 0 }}
