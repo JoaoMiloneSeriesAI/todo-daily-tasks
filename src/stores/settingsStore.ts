@@ -13,6 +13,9 @@ interface SettingsStore {
   updateSettings: (updates: Partial<AppSettings>) => Promise<void>;
   resetSettings: () => Promise<void>;
 
+  // Clear all data
+  clearAllData: () => Promise<void>;
+
   // Template operations
   addTemplate: (template: Omit<CardTemplate, 'id'>) => void;
   updateTemplate: (id: string, updates: Partial<CardTemplate>) => void;
@@ -123,6 +126,24 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     } catch (error) {
       console.error('Error resetting settings:', error);
     }
+  },
+
+  clearAllData: async () => {
+    try {
+      // Wipe the entire electron-store on disk via dedicated IPC channel
+      if (typeof window !== 'undefined' && window.electronAPI) {
+        await window.electronAPI.clearAllData();
+      }
+    } catch (error) {
+      console.error('Error clearing data on disk:', error);
+    }
+
+    // Reset in-memory state
+    set({
+      settings: DEFAULT_SETTINGS,
+      templates: [],
+      isLoading: false,
+    });
   },
 
   // Template operations (with persistence)

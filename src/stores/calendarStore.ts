@@ -34,6 +34,9 @@ interface CalendarStore {
 
   // Calendar generation
   generateCalendarDays: () => Promise<void>;
+
+  // Reset
+  resetCalendar: () => void;
 }
 
 export const useCalendarStore = create<CalendarStore>((set, get) => ({
@@ -276,5 +279,17 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
     });
 
     set({ days: calendarDays });
+  },
+
+  resetCalendar: () => {
+    set({
+      currentMonth: new Date(),
+      selectedDate: new Date(),
+      days: [],
+      holidays: [],
+      isLoadingHolidays: false,
+      _cachedYears: new Set(),
+      _fetchingYears: new Set(),
+    });
   },
 }));

@@ -17,6 +17,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('fetch-holidays', params),
   fetchCountries: () => ipcRenderer.invoke('fetch-countries'),
 
+  // Clear all data
+  clearAllData: () => ipcRenderer.invoke('clear-all-data'),
+
   // Export/Import
   exportData: (data: unknown) => ipcRenderer.invoke('export-data', data),
   importData: () => ipcRenderer.invoke('import-data'),

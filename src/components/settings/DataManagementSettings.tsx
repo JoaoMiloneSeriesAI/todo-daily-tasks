@@ -4,6 +4,9 @@ import { Download, Upload, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '../shared/Button';
 import { Modal } from '../shared/Modal';
 import { toast } from '../shared/Toast';
+import { useSettingsStore } from '../../stores/settingsStore';
+import { useBoardStore } from '../../stores/boardStore';
+import { useCalendarStore } from '../../stores/calendarStore';
 
 export function DataManagementSettings() {
   const { t } = useTranslation();
@@ -38,13 +41,19 @@ export function DataManagementSettings() {
     } finally { setIsImporting(false); }
   };
 
+  const { clearAllData } = useSettingsStore();
+  const { resetBoard } = useBoardStore();
+  const { resetCalendar } = useCalendarStore();
+
   const handleClearData = async () => {
     try {
-      await window.electronAPI.saveData('boards', {} as any);
-      await window.electronAPI.saveData('settings', {} as any);
-      await window.electronAPI.saveData('templates', [] as any);
-      toast.success(t('settingsData.clearSuccess'));
+      // Clear disk data and reset settings store (sets hasCompletedOnboarding to false)
+      await clearAllData();
+      // Reset board and calendar in-memory state
+      resetBoard();
+      resetCalendar();
       setShowClearModal(false);
+      // No toast needed — the app will immediately show FTUE
     } catch (error) {
       console.error('Clear data failed:', error);
       toast.error(t('settingsData.clearError'));

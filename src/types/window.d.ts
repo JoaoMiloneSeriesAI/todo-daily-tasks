@@ -16,6 +16,9 @@ export interface ElectronAPI {
   fetchHolidays: (params: { countryCode: string; year: number; languageCode?: string }) => Promise<Holiday[]>;
   fetchCountries: () => Promise<Country[]>;
 
+  // Clear all data
+  clearAllData: () => Promise<void>;
+
   // Export/Import
   exportData: (data: unknown) => Promise<{ success: boolean; path?: string }>;
   importData: () => Promise<{ success: boolean; data?: unknown }>;

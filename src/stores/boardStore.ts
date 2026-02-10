@@ -43,6 +43,9 @@ interface BoardStore {
   // Utility
   getCardsByColumn: (columnId: string) => Card[];
   getCard: (cardId: string) => Card | undefined;
+
+  // Reset
+  resetBoard: () => void;
 }
 
 export const useBoardStore = create<BoardStore>((set, get) => ({
@@ -338,5 +341,14 @@ export const useBoardStore = create<BoardStore>((set, get) => ({
 
   getCard: (cardId) => {
     return get().cards.find((card) => card.id === cardId);
+  },
+
+  resetBoard: () => {
+    set({
+      columns: getDefaultColumns(),
+      cards: [],
+      selectedDate: new Date(),
+      isLoading: false,
+    });
   },
 }));

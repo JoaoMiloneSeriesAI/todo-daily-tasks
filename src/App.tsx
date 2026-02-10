@@ -118,15 +118,19 @@ function App() {
     }
   }, [isSettingsLoading]);
 
-  // Check if onboarding is needed — only after settings have loaded from disk
+  // Check if onboarding is needed — after initial load, and also when data is cleared
   useEffect(() => {
     if (settingsLoaded && !settings.hasCompletedOnboarding) {
       setShowOnboarding(true);
+      setCurrentView('calendar');
     }
   }, [settingsLoaded, settings.hasCompletedOnboarding]);
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+    // Reload settings and board after onboarding completes
+    loadSettings();
+    loadBoardForDate(new Date());
   };
 
   const handleNavigateToBoard = (date: Date) => {

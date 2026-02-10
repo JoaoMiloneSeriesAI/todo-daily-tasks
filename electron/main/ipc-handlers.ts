@@ -75,6 +75,16 @@ export function setupIpcHandlers() {
     }
   });
 
+  // Clear all data
+  ipcMain.handle('clear-all-data', async () => {
+    try {
+      await dataService.clearStore();
+    } catch (error) {
+      log.error('Error clearing all data:', error);
+      throw error;
+    }
+  });
+
   // Export/Import operations
   ipcMain.handle('export-data', async (_, data: unknown) => {
     try {

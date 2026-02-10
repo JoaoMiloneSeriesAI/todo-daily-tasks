@@ -125,6 +125,20 @@ export class DataService {
     }
   }
 
+  /// <summary>
+  /// Clears the entire electron-store and re-initializes with defaults.
+  /// Used by the "Clear All Data" feature.
+  /// </summary>
+  async clearStore(): Promise<void> {
+    try {
+      this.store.clear();
+      log.info('All data cleared from store');
+    } catch (error) {
+      log.error('Error clearing store:', error);
+      throw error;
+    }
+  }
+
   // Default templates
   private getDefaultTemplates(): unknown[] {
     return [
