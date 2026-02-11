@@ -44,6 +44,19 @@ test-results/
 playwright-report/
 coverage/
 
+# Android (Capacitor) build artifacts
+android/app/build/
+android/.gradle/
+android/build/
+android/capacitor-cordova-android-plugins/build/
+android/local.properties
+*.apk
+*.aab
+
+# iOS (Capacitor) build artifacts
+ios/App/Pods/
+ios/App/build/
+
 # Misc
 *.tsbuildinfo
 *.njsproj

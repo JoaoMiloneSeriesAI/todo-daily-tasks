@@ -105,8 +105,13 @@ export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, on
     e.preventDefault();
     if (menuBtnRef.current) {
       const rect = menuBtnRef.current.getBoundingClientRect();
+      const menuHeight = 320; // approximate max height of the menu
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const top = spaceBelow < menuHeight
+        ? Math.max(8, rect.top - menuHeight - 4) // flip above, clamp to top edge
+        : rect.bottom + 4;
       setMenuPos({
-        top: rect.bottom + 4,
+        top,
         left: Math.min(rect.right - 192, window.innerWidth - 200),
       });
     }
@@ -119,11 +124,11 @@ export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, on
         ref={setNodeRef}
         style={style}
         {...attributes}
-        // We handle pointerdown ourselves to forward to dnd-kit AND track taps
+        {...listeners}
+        // Override pointer handlers for tap-vs-drag detection (desktop);
+        // onTouchStart from the spread above remains for TouchSensor (mobile)
         onPointerDown={handleCardPointerDown}
         onPointerUp={handleCardPointerUp}
-        // Spread remaining listeners (onKeyDown for KeyboardSensor) excluding onPointerDown
-        onKeyDown={listeners?.onKeyDown as React.KeyboardEventHandler}
         className={`
           bg-[var(--color-surface)] rounded-lg shadow-sm overflow-hidden
           border border-[var(--color-border)]
@@ -155,8 +160,11 @@ export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, on
               <button
                 ref={menuBtnRef}
                 onPointerDown={(e) => {
-                  e.stopPropagation(); // Prevent dnd-kit drag activation
+                  e.stopPropagation(); // Prevent dnd-kit PointerSensor drag activation
                   pointerStart.current = null; // Prevent card tap detection
+                }}
+                onTouchStart={(e) => {
+                  e.stopPropagation(); // Prevent dnd-kit TouchSensor drag activation on mobile
                 }}
                 onClick={handleMenuToggle}
                 className="p-1 hover:bg-[var(--color-surface-hover)] rounded transition-colors"

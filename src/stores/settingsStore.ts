@@ -76,15 +76,13 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       }
 
       // Also load persisted templates
-      if (typeof window !== 'undefined' && window.electronAPI) {
-        try {
-          const loadedTemplates = await window.electronAPI.loadData('templates');
-          if (Array.isArray(loadedTemplates) && loadedTemplates.length > 0) {
-            set({ templates: loadedTemplates as CardTemplate[] });
-          }
-        } catch {
-          // Use default templates
+      try {
+        const loadedTemplates = await ipcService.loadTemplates();
+        if (Array.isArray(loadedTemplates) && loadedTemplates.length > 0) {
+          set({ templates: loadedTemplates as CardTemplate[] });
         }
+      } catch {
+        // Use default templates
       }
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -130,10 +128,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
 
   clearAllData: async () => {
     try {
-      // Wipe the entire electron-store on disk via dedicated IPC channel
-      if (typeof window !== 'undefined' && window.electronAPI) {
-        await window.electronAPI.clearAllData();
-      }
+      await ipcService.clearAllData();
     } catch (error) {
       console.error('Error clearing data on disk:', error);
     }
@@ -157,9 +152,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       templates: [...state.templates, newTemplate],
     }));
     // Persist
-    if (typeof window !== 'undefined' && window.electronAPI) {
-      window.electronAPI.saveData('templates', get().templates as any);
-    }
+    ipcService.saveTemplates(get().templates);
   },
 
   updateTemplate: (id, updates) => {
@@ -168,18 +161,14 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         template.id === id ? { ...template, ...updates } : template
       ),
     }));
-    if (typeof window !== 'undefined' && window.electronAPI) {
-      window.electronAPI.saveData('templates', get().templates as any);
-    }
+    ipcService.saveTemplates(get().templates);
   },
 
   deleteTemplate: (id) => {
     set((state) => ({
       templates: state.templates.filter((template) => template.id !== id),
     }));
-    if (typeof window !== 'undefined' && window.electronAPI) {
-      window.electronAPI.saveData('templates', get().templates as any);
-    }
+    ipcService.saveTemplates(get().templates);
   },
 
   getTemplateById: (id) => {

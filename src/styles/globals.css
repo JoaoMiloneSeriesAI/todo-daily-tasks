@@ -136,3 +136,38 @@ input, textarea, [contenteditable],
   word-wrap: break-word;
   overflow: hidden;
 }
+
+/* Mobile safe area insets for notch/Dynamic Island/nav bars */
+.mobile-safe-area {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Prevent overscroll bounce on mobile */
+html.mobile-app {
+  overscroll-behavior: none;
+  overflow: hidden;
+  height: 100%;
+}
+
+html.mobile-app body {
+  height: 100%;
+  overflow: hidden;
+}
+
+html.mobile-app #root {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Touch-friendly tap targets — ensure minimum 44px on mobile */
+@media (max-width: 768px) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

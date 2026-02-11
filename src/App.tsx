@@ -6,6 +6,8 @@ import { ToastContainer } from './components/shared/Toast';
 import { LoadingSpinner } from './components/shared';
 import { useSettingsStore } from './stores/settingsStore';
 import { useBoardStore } from './stores/boardStore';
+import { useIsMobile } from './hooks/usePlatform';
+import { CalendarDays, LayoutDashboard, BarChart3, SettingsIcon } from 'lucide-react';
 
 import { Onboarding } from './components/onboarding/Onboarding';
 
@@ -58,6 +60,7 @@ function App() {
   const { t, i18n } = useTranslation();
   const { loadSettings, settings, isLoading: isSettingsLoading } = useSettingsStore();
   const { loadBoardForDate } = useBoardStore();
+  const isMobile = useIsMobile();
 
   // Initialize app
   useEffect(() => {
@@ -107,6 +110,54 @@ function App() {
       applyAccentColor(accent);
     }
   }, [settings.appearance.accentColor]);
+
+  // Mobile: sync status bar with theme
+  useEffect(() => {
+    if (!isMobile) return;
+
+    (async () => {
+      try {
+        const { StatusBar, Style } = await import('@capacitor/status-bar');
+        const isDark = settings.appearance.theme === 'dark' ||
+          (settings.appearance.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
+        await StatusBar.setBackgroundColor({
+          color: isDark ? '#1a1a2e' : '#ffffff',
+        });
+      } catch {
+        // StatusBar not available
+      }
+    })();
+  }, [isMobile, settings.appearance.theme]);
+
+  // Mobile: handle Android back button for in-app navigation
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let listenerHandle: { remove: () => void } | null = null;
+
+    (async () => {
+      try {
+        const { App: CapApp } = await import('@capacitor/app');
+        const handle = await CapApp.addListener('backButton', () => {
+          // If not on calendar, go back to calendar; otherwise exit the app
+          if (currentView !== 'calendar') {
+            setCurrentView('calendar');
+          } else {
+            CapApp.exitApp();
+          }
+        });
+        listenerHandle = handle;
+      } catch {
+        // @capacitor/app not available
+      }
+    })();
+
+    return () => {
+      listenerHandle?.remove();
+    };
+  }, [isMobile, currentView]);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
@@ -160,55 +211,64 @@ function App() {
     }
   };
 
+  const mobileNavItems: { view: View; icon: React.ReactNode; label: string }[] = [
+    { view: 'calendar', icon: <CalendarDays size={20} />, label: t('app.calendar') },
+    { view: 'board', icon: <LayoutDashboard size={20} />, label: t('app.board') },
+    { view: 'dashboard', icon: <BarChart3 size={20} />, label: t('app.dashboard') },
+    { view: 'settings', icon: <SettingsIcon size={20} />, label: t('app.settings') },
+  ];
+
   return (
     <ErrorBoundary>
       <ToastContainer />
-      <div className="min-h-screen bg-[var(--color-bg-primary)]">
-      {/* Navigation Bar — draggable on macOS */}
-      <nav
-        className="sticky top-0 z-30 bg-[var(--color-surface)] border-b border-[var(--color-border)] px-4 py-3 pl-20"
-        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-      >
-        <div className="flex items-center justify-center">
-          <div
-            className="flex items-center gap-3"
-            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-          >
-            <h1 className="text-lg font-bold whitespace-nowrap text-[var(--color-accent)]">
-              {t('app.title')}
-            </h1>
+      <div className={`min-h-screen bg-[var(--color-bg-primary)] flex flex-col ${isMobile ? 'mobile-safe-area' : ''}`}>
 
-            <div className="w-px h-5 bg-[var(--color-border)]" />
-          </div>
+      {/* Desktop Navigation Bar — draggable on macOS */}
+      {!isMobile && (
+        <nav
+          className="sticky top-0 z-30 bg-[var(--color-surface)] border-b border-[var(--color-border)] px-4 py-3 pl-20"
+          style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+        >
+          <div className="flex items-center justify-center">
+            <div
+              className="flex items-center gap-3"
+              style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            >
+              <h1 className="text-lg font-bold whitespace-nowrap text-[var(--color-accent)]">
+                {t('app.title')}
+              </h1>
 
-          <div
-            className="flex items-center gap-1 ml-3"
-            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-          >
-            {(['calendar', 'board', 'dashboard', 'settings'] as const).map((view) => (
-              <button
-                key={view}
-                onClick={() => setCurrentView(view)}
-                className="relative px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-                style={{ color: currentView === view ? 'var(--color-accent-text)' : 'var(--color-text-secondary)' }}
-              >
-                {/* Animated active indicator pill */}
-                {currentView === view && (
-                  <motion.div
-                    layoutId="navIndicator"
-                    className="absolute inset-0 bg-[var(--color-accent)] rounded-lg"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <span className="relative z-10">{t(`app.${view}`)}</span>
-              </button>
-            ))}
+              <div className="w-px h-5 bg-[var(--color-border)]" />
+            </div>
+
+            <div
+              className="flex items-center gap-1 ml-3"
+              style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            >
+              {(['calendar', 'board', 'dashboard', 'settings'] as const).map((view) => (
+                <button
+                  key={view}
+                  onClick={() => setCurrentView(view)}
+                  className="relative px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                  style={{ color: currentView === view ? 'var(--color-accent-text)' : 'var(--color-text-secondary)' }}
+                >
+                  {currentView === view && (
+                    <motion.div
+                      layoutId="navIndicator"
+                      className="absolute inset-0 bg-[var(--color-accent)] rounded-lg"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <span className="relative z-10">{t(`app.${view}`)}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       {/* Main Content */}
-      <main className="p-6 max-w-7xl mx-auto">
+      <main className={`flex-1 ${isMobile ? 'p-3 pb-28' : 'p-6'} max-w-7xl mx-auto w-full`}>
         <Suspense fallback={<div className="flex items-center justify-center h-64"><LoadingSpinner /></div>}>
           <AnimatePresence mode="wait">
             <motion.div
@@ -223,6 +283,28 @@ function App() {
           </AnimatePresence>
         </Suspense>
       </main>
+
+      {/* Mobile Bottom Tab Bar — floating pill island */}
+      {isMobile && (
+        <nav className="fixed bottom-4 left-4 right-4 z-50 safe-area-bottom">
+          <div className="flex items-center justify-around bg-[var(--color-surface)]/85 backdrop-blur-xl rounded-2xl shadow-lg border border-[var(--color-border)]/50 px-2 py-1.5">
+            {mobileNavItems.map(({ view, icon, label }) => (
+              <button
+                key={view}
+                onClick={() => setCurrentView(view)}
+                className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all min-w-[60px] ${
+                  currentView === view
+                    ? 'text-[var(--color-accent)] bg-[var(--color-accent-light)]'
+                    : 'text-[var(--color-text-tertiary)]'
+                }`}
+              >
+                {icon}
+                <span className="text-[10px] font-medium">{label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+      )}
     </div>
     </ErrorBoundary>
   );

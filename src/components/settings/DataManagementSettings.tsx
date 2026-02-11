@@ -7,22 +7,24 @@ import { toast } from '../shared/Toast';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { useBoardStore } from '../../stores/boardStore';
 import { useCalendarStore } from '../../stores/calendarStore';
+import { ipcService } from '../../services/ipcService';
+import { useIsMobile } from '../../hooks/usePlatform';
 
 export function DataManagementSettings() {
   const { t } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const allData = {
-        boards: await window.electronAPI.loadData('boards'),
-        settings: await window.electronAPI.loadData('settings'),
-        templates: await window.electronAPI.loadData('templates'),
-      };
-      await window.electronAPI.exportData(allData);
+      const boards = await ipcService.loadBoard('boards');
+      const settings = await ipcService.getSettings();
+      const templates = await ipcService.loadTemplates();
+      const allData = { boards, settings, templates };
+      await ipcService.exportData(allData);
       toast.success(t('settingsData.exportSuccess'));
     } catch (error) {
       console.error('Export failed:', error);
@@ -33,8 +35,8 @@ export function DataManagementSettings() {
   const handleImport = async () => {
     setIsImporting(true);
     try {
-      const importedData = await window.electronAPI.importData();
-      if (importedData) toast.success(t('settingsData.importSuccess'));
+      const importedData = await ipcService.importData();
+      if (importedData?.success) toast.success(t('settingsData.importSuccess'));
     } catch (error) {
       console.error('Import failed:', error);
       toast.error(t('settingsData.importError'));
@@ -67,31 +69,36 @@ export function DataManagementSettings() {
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">{t('settingsData.description')}</p>
       </div>
 
-      <div className="p-6 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"><Download size={24} /></div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{t('settingsData.exportTitle')}</h3>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-4">{t('settingsData.exportDescription')}</p>
-            <Button onClick={handleExport} disabled={isExporting} leftIcon={<Download size={16} />}>
-              {isExporting ? t('settingsData.exporting') : t('settingsData.exportButton')}
-            </Button>
+      {/* Export/Import — desktop only */}
+      {!isMobile && (
+        <>
+          <div className="p-6 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"><Download size={24} /></div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{t('settingsData.exportTitle')}</h3>
+                <p className="text-sm text-[var(--color-text-secondary)] mb-4">{t('settingsData.exportDescription')}</p>
+                <Button onClick={handleExport} disabled={isExporting} leftIcon={<Download size={16} />}>
+                  {isExporting ? t('settingsData.exporting') : t('settingsData.exportButton')}
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="p-6 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"><Upload size={24} /></div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{t('settingsData.importTitle')}</h3>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-4">{t('settingsData.importDescription')}</p>
-            <Button onClick={handleImport} disabled={isImporting} leftIcon={<Upload size={16} />} variant="secondary">
-              {isImporting ? t('settingsData.importing') : t('settingsData.importButton')}
-            </Button>
+          <div className="p-6 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"><Upload size={24} /></div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{t('settingsData.importTitle')}</h3>
+                <p className="text-sm text-[var(--color-text-secondary)] mb-4">{t('settingsData.importDescription')}</p>
+                <Button onClick={handleImport} disabled={isImporting} leftIcon={<Upload size={16} />} variant="secondary">
+                  {isImporting ? t('settingsData.importing') : t('settingsData.importButton')}
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
 
       <div className="p-6 rounded-lg border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
         <div className="flex items-start gap-4">

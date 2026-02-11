@@ -13,6 +13,8 @@ interface ModalProps {
   headerContent?: ReactNode;
   /** Optional color bar rendered at the very top of the modal above the header */
   headerColor?: string;
+  /** When true, the modal fills the entire viewport (useful on mobile) */
+  fullScreen?: boolean;
 }
 
 /// <summary>
@@ -28,6 +30,7 @@ export function Modal({
   showCloseButton = true,
   headerContent,
   headerColor,
+  fullScreen = false,
 }: ModalProps) {
   const titleId = useId();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -123,7 +126,7 @@ export function Modal({
           />
 
           {/* Modal wrapper — only close if mousedown directly on the wrapper, not bubbled from children */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+          <div className={`fixed inset-0 z-50 flex items-center justify-center ${fullScreen ? 'p-0' : 'p-4'}`} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
             <motion.div
               ref={modalRef}
               initial={{ scale: 0.95, opacity: 0 }}
@@ -134,7 +137,11 @@ export function Modal({
               aria-modal="true"
               aria-labelledby={title ? titleId : undefined}
               tabIndex={-1}
-              className={`bg-[var(--color-surface)] rounded-xl shadow-xl w-full ${sizeStyles[size]} max-h-[90vh] overflow-hidden flex flex-col outline-none`}
+              className={`bg-[var(--color-surface)] shadow-xl w-full overflow-hidden flex flex-col outline-none ${
+                fullScreen
+                  ? 'h-full max-h-full rounded-none pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]'
+                  : `rounded-xl ${sizeStyles[size]} max-h-[90vh]`
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Color bar (optional) */}

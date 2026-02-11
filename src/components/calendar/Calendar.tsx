@@ -58,7 +58,7 @@ export function Calendar({ onDayClick }: CalendarProps) {
       />
 
       {/* Week day headers */}
-      <div className="grid grid-cols-7 gap-2 mb-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2">
         {weekDays.map((day) => (
           <div
             key={day}
@@ -69,10 +69,10 @@ export function Calendar({ onDayClick }: CalendarProps) {
         ))}
       </div>
 
-      {/* Fixed-height calendar grid — rows stretch to fill, like Google Calendar */}
-      <div className="h-[540px]">
+      {/* Responsive calendar grid — rows stretch to fill, adapts to mobile/landscape */}
+      <div className="h-[min(540px,calc(100dvh-280px))] min-h-[320px]">
         {isLoadingHolidays && days.length === 0 ? (
-          <div className="grid grid-cols-7 gap-2 h-full" style={{ gridTemplateRows: 'repeat(5, 1fr)' }}>
+          <div className="grid grid-cols-7 gap-1 sm:gap-2 h-full" style={{ gridTemplateRows: 'repeat(5, 1fr)' }}>
             {Array.from({ length: 35 }).map((_, i) => (
               <div key={i} className="rounded-lg animate-shimmer" />
             ))}
@@ -85,7 +85,7 @@ export function Calendar({ onDayClick }: CalendarProps) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction * -40 }}
               transition={{ duration: 0.2, ease: 'easeInOut' as const }}
-              className="grid grid-cols-7 gap-2 h-full"
+              className="grid grid-cols-7 gap-1 sm:gap-2 h-full"
               style={{ gridTemplateRows: `repeat(${Math.ceil(days.length / 7)}, 1fr)` }}
             >
               {days.map((day) => (

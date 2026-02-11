@@ -16,6 +16,8 @@
     "create": "Create",
     "loading": "Loading...",
     "noData": "No data available",
+    "previous": "Previous",
+    "next": "Next",
     "today": "Today",
     "selected": "Selected",
     "holiday": "Holiday",

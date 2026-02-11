@@ -88,12 +88,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
         <div>
           <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-3">{t('onboarding.workDays')}</label>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-7 gap-1.5">
             {dayLabels.map((day) => (
               <button
                 key={day.key}
                 onClick={() => toggleWorkDay(day.key)}
-                className={`flex-1 py-3 rounded-lg text-sm font-medium transition-colors ${
+                className={`py-2.5 rounded-lg text-xs font-medium transition-colors ${
                   workDays[day.key]
                     ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)]'
                     : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]'
@@ -170,8 +170,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center p-6">
-      <div className="w-full max-w-lg bg-[var(--color-surface)] rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-lg bg-[var(--color-surface)] rounded-2xl shadow-xl p-5 sm:p-8">
         <div className="flex items-center justify-center gap-2 mb-8">
           {[0, 1, 2].map((s) => (
             <div key={s} className="h-2 rounded-full transition-all duration-300" style={{

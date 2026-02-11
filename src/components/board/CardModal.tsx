@@ -41,6 +41,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
   const { t } = useTranslation();
   const { templates, getTemplateById, settings } = useSettingsStore();
   const globalTags = settings.tags || [];
+  const isMobileView = typeof window !== 'undefined' && window.innerWidth < 768;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [templateId, setTemplateId] = useState('');
@@ -294,6 +295,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
         onClose={() => { handleInlineSave(); onClose(); }}
         title={title || t('card.editCard')}
         size="lg"
+        fullScreen={isMobileView}
         headerColor={effectiveColor}
         headerContent={
           <div className="flex items-center gap-2">
@@ -461,28 +463,26 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
             </button>
           )}
 
-          {/* Actions */}
-          <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
-            <div className="flex flex-wrap gap-2">
-              {onMoveToPreviousDay && (
-                <Button variant="secondary" size="sm" onClick={() => { handleInlineSave(); onMoveToPreviousDay(); onClose(); }}>
-                  <ArrowLeftCircle size={14} className="mr-1" /> {t('card.moveToPreviousDay')}
-                </Button>
-              )}
-              {onMoveToNextDay && (
-                <Button variant="secondary" size="sm" onClick={() => { handleInlineSave(); onMoveToNextDay(); onClose(); }}>
-                  <ArrowRightCircle size={14} className="mr-1" /> {t('card.moveToNextDay')}
-                </Button>
-              )}
-              {onDuplicate && (
-                <Button variant="secondary" size="sm" onClick={() => { onDuplicate(); onClose(); }}>
-                  <Copy size={14} className="mr-1" /> {t('card.duplicate')}
-                </Button>
-              )}
-            </div>
+          {/* Actions -- 2-column grid layout */}
+          <div className="grid grid-cols-2 gap-2 pt-4 border-t border-[var(--color-border)]">
+            {onMoveToPreviousDay && (
+              <Button variant="secondary" size="sm" onClick={() => { handleInlineSave(); onMoveToPreviousDay(); onClose(); }} className="w-full justify-center">
+                <ArrowLeftCircle size={14} className="mr-1.5" /> {t('common.previous')}
+              </Button>
+            )}
+            {onMoveToNextDay && (
+              <Button variant="secondary" size="sm" onClick={() => { handleInlineSave(); onMoveToNextDay(); onClose(); }} className="w-full justify-center">
+                <ArrowRightCircle size={14} className="mr-1.5" /> {t('common.next')}
+              </Button>
+            )}
+            {onDuplicate && (
+              <Button variant="secondary" size="sm" onClick={() => { onDuplicate(); onClose(); }} className="w-full justify-center">
+                <Copy size={14} className="mr-1.5" /> {t('card.duplicate')}
+              </Button>
+            )}
             {onDelete && (
-              <Button variant="danger" size="sm" onClick={() => setShowDeleteConfirm(true)}>
-                <Trash2 size={14} className="mr-1" /> {t('card.delete')}
+              <Button variant="danger" size="sm" onClick={() => setShowDeleteConfirm(true)} className="w-full justify-center">
+                <Trash2 size={14} className="mr-1.5" /> {t('card.delete')}
               </Button>
             )}
           </div>
@@ -504,7 +504,7 @@ export function CardModal({ isOpen, onClose, onSave, card, columnId, onMoveToNex
 
   // CREATE MODE — full form (only for new cards)
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={t('card.newCard')} size="lg" headerColor={effectiveColor}>
+    <Modal isOpen={isOpen} onClose={onClose} title={t('card.newCard')} size="lg" fullScreen={isMobileView} headerColor={effectiveColor}>
       <div className="space-y-4 min-h-[400px]">
         {/* Live card preview */}
         <div>

@@ -6,6 +6,7 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  TouchSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
@@ -26,6 +27,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Plus, ArrowLeft, PartyPopper } from 'lucide-react';
 import { Button, Input, Modal } from '../shared';
 import { toast } from '../shared/Toast';
+import { isMobilePlatform } from '../../hooks/usePlatform';
 
 interface BoardProps {
   selectedDate: Date;
@@ -67,6 +69,12 @@ export function Board({ selectedDate, onBack }: BoardProps) {
         distance: 8,
       },
     }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 400,
+        tolerance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -77,6 +85,12 @@ export function Board({ selectedDate, onBack }: BoardProps) {
     const card = cards.find((c) => c.id === active.id);
     if (card) {
       setActiveCard(card);
+      // Haptic feedback on mobile when drag starts
+      if (isMobilePlatform()) {
+        import('@capacitor/haptics').then(({ Haptics, ImpactStyle }) => {
+          Haptics.impact({ style: ImpactStyle.Medium });
+        }).catch(() => {});
+      }
     }
   };
 
@@ -259,7 +273,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
               ))}
 
             {/* Add Column Button */}
-            <div className="flex-shrink-0 w-80">
+            <div className="flex-shrink-0 w-[85vw] sm:w-80">
               <button
                 onClick={() => setIsAddColumnModalOpen(true)}
                 className="w-full py-3 px-4 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] text-sm font-medium rounded-lg border-2 border-dashed border-[var(--color-border)] transition-colors flex items-center justify-center gap-2"

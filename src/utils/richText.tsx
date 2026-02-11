@@ -1,4 +1,5 @@
 import React from 'react';
+import { ipcService } from '../services/ipcService';
 
 /// <summary>
 /// Detects if the current platform is macOS for keyboard shortcut display.
@@ -218,7 +219,7 @@ function renderInlineFormatting(text: string, keyPrefix: string): React.ReactNod
         <a
           key={`${keyPrefix}-u-${idx}`}
           href={url}
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.electronAPI?.openExternal(url); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); ipcService.openExternal(url); }}
           className="text-[var(--color-accent)] underline hover:opacity-80 cursor-pointer"
         >
           {url}
