@@ -41,9 +41,10 @@ export function formatDate(date: Date, formatStr: string = 'MMMM d, yyyy'): stri
 export function getWeekDays(firstDayOfWeek: 0 | 1): string[] {
   const locale = getDateLocale();
   const start = startOfWeek(new Date(), { weekStartsOn: firstDayOfWeek });
-  return Array.from({ length: 7 }, (_, i) =>
-    format(addDays(start, i), 'EEE', { locale })
-  );
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = format(addDays(start, i), 'EEE', { locale });
+    return day.charAt(0).toUpperCase() + day.slice(1);
+  });
 }
 
 /**

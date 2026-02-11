@@ -22,7 +22,7 @@ import { CardModal } from './CardModal';
 import { NerdStatsModal } from './NerdStatsModal';
 import { Card as CardType } from '../../types/card';
 import { format } from 'date-fns';
-import { getDateLocale } from '../../utils/dateFnsLocale';
+import { formatLocalized } from '../../utils/dateFnsLocale';
 import { motion } from 'framer-motion';
 import { Calendar, Plus, ArrowLeft, PartyPopper } from 'lucide-react';
 import { Button, Input, Modal } from '../shared';
@@ -227,7 +227,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
             <Calendar className="text-[var(--color-accent)]" size={28} />
             <div>
               <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
-                {format(selectedDate, 'EEEE, MMMM d, yyyy', { locale: getDateLocale() })}
+                {formatLocalized(selectedDate, 'EEEE, MMMM d, yyyy')}
               </h2>
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-sm text-[var(--color-text-secondary)]">
@@ -247,14 +247,14 @@ export function Board({ selectedDate, onBack }: BoardProps) {
       </div>
 
       {/* Board Columns */}
-      <div className="flex-1 overflow-x-auto">
+      <div className="flex-1 overflow-x-auto overflow-y-hidden">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="flex gap-4 h-full pb-4">
+          <div className="flex gap-4 min-h-full pb-4">
             {sortedColumns.map((column) => (
                 <Column
                   key={column.id}
@@ -273,7 +273,7 @@ export function Board({ selectedDate, onBack }: BoardProps) {
               ))}
 
             {/* Add Column Button */}
-            <div className="flex-shrink-0 w-[85vw] sm:w-80">
+            <div className="flex-shrink-0 w-[72vw] sm:w-80">
               <button
                 onClick={() => setIsAddColumnModalOpen(true)}
                 className="w-full py-3 px-4 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] text-sm font-medium rounded-lg border-2 border-dashed border-[var(--color-border)] transition-colors flex items-center justify-center gap-2"

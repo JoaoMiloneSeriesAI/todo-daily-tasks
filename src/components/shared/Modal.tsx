@@ -121,12 +121,12 @@ export function Modal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
-            className="fixed inset-0 bg-[var(--color-overlay)] z-40"
+            className="fixed inset-0 bg-[var(--color-overlay)] z-[60]"
             aria-hidden="true"
           />
 
           {/* Modal wrapper — only close if mousedown directly on the wrapper, not bubbled from children */}
-          <div className={`fixed inset-0 z-50 flex items-center justify-center ${fullScreen ? 'p-0' : 'p-4'}`} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+          <div className={`fixed inset-0 z-[70] flex items-center justify-center ${fullScreen ? 'p-0' : 'p-4'}`} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
             <motion.div
               ref={modalRef}
               initial={{ scale: 0.95, opacity: 0 }}
@@ -170,7 +170,7 @@ export function Modal({
               </div>
 
               {/* Content */}
-              <div className="px-6 py-4 overflow-y-auto flex-1">
+              <div className={`px-6 py-4 overflow-y-auto flex-1 ${fullScreen ? 'pb-20' : ''}`}>
                 {children}
               </div>
             </motion.div>

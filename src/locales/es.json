@@ -163,12 +163,19 @@
     "description": "Selecciona cuáles días de la semana son laborables. Se resaltarán en el calendario.",
     "hint": "Los días laborables se usan para distinguir entre días de trabajo y fines de semana/festivos en el calendario.",
     "sunday": "Domingo",
+    "sundayShort": "Dom",
     "monday": "Lunes",
+    "mondayShort": "Lun",
     "tuesday": "Martes",
+    "tuesdayShort": "Mar",
     "wednesday": "Miércoles",
+    "wednesdayShort": "Mié",
     "thursday": "Jueves",
+    "thursdayShort": "Jue",
     "friday": "Viernes",
-    "saturday": "Sábado"
+    "fridayShort": "Vie",
+    "saturday": "Sábado",
+    "saturdayShort": "Sáb"
   },
   "settingsTemplates": {
     "title": "Plantillas",

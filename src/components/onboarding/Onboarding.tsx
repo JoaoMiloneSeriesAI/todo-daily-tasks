@@ -41,13 +41,13 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const dayLabels = [
-    { key: 'monday' as const, labelKey: 'settingsWorkDays.monday' },
-    { key: 'tuesday' as const, labelKey: 'settingsWorkDays.tuesday' },
-    { key: 'wednesday' as const, labelKey: 'settingsWorkDays.wednesday' },
-    { key: 'thursday' as const, labelKey: 'settingsWorkDays.thursday' },
-    { key: 'friday' as const, labelKey: 'settingsWorkDays.friday' },
-    { key: 'saturday' as const, labelKey: 'settingsWorkDays.saturday' },
-    { key: 'sunday' as const, labelKey: 'settingsWorkDays.sunday' },
+    { key: 'monday' as const, shortKey: 'settingsWorkDays.mondayShort' },
+    { key: 'tuesday' as const, shortKey: 'settingsWorkDays.tuesdayShort' },
+    { key: 'wednesday' as const, shortKey: 'settingsWorkDays.wednesdayShort' },
+    { key: 'thursday' as const, shortKey: 'settingsWorkDays.thursdayShort' },
+    { key: 'friday' as const, shortKey: 'settingsWorkDays.fridayShort' },
+    { key: 'saturday' as const, shortKey: 'settingsWorkDays.saturdayShort' },
+    { key: 'sunday' as const, shortKey: 'settingsWorkDays.sundayShort' },
   ];
 
   const selectClass = "w-full px-4 py-3 bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded-lg text-[var(--color-text-primary)] text-sm";
@@ -99,7 +99,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                     : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]'
                 }`}
               >
-                {t(day.labelKey).slice(0, 3)}
+                {t(day.shortKey)}
               </button>
             ))}
           </div>

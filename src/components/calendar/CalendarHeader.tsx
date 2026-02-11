@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { getDateLocale } from '../../utils/dateFnsLocale';
+import { formatLocalized } from '../../utils/dateFnsLocale';
 import { Button } from '../shared';
 
 interface CalendarHeaderProps {
@@ -24,7 +23,7 @@ export function CalendarHeader({
       <div className="flex items-center gap-2">
         <CalendarIcon className="text-[var(--color-accent)]" size={28} />
         <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
-          {format(currentMonth, 'MMMM yyyy', { locale: getDateLocale() })}
+          {formatLocalized(currentMonth, 'MMMM yyyy')}
         </h2>
       </div>
 

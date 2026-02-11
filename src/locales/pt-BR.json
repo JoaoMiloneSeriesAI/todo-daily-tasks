@@ -163,12 +163,19 @@
     "description": "Selecione quais dias da semana são dias úteis. Eles serão destacados no calendário.",
     "hint": "Os dias úteis são usados para distinguir entre dias de trabalho e fins de semana/feriados no calendário.",
     "sunday": "Domingo",
+    "sundayShort": "Dom",
     "monday": "Segunda-feira",
+    "mondayShort": "Seg",
     "tuesday": "Terça-feira",
+    "tuesdayShort": "Ter",
     "wednesday": "Quarta-feira",
+    "wednesdayShort": "Qua",
     "thursday": "Quinta-feira",
+    "thursdayShort": "Qui",
     "friday": "Sexta-feira",
-    "saturday": "Sábado"
+    "fridayShort": "Sex",
+    "saturday": "Sábado",
+    "saturdayShort": "Sáb"
   },
   "settingsTemplates": {
     "title": "Modelos",

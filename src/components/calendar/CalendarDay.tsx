@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarDay as CalendarDayType } from '../../types/calendar';
 import { format, isSameMonth } from 'date-fns';
-import { getDateLocale } from '../../utils/dateFnsLocale';
+import { formatLocalized } from '../../utils/dateFnsLocale';
 
 interface CalendarDayProps {
   day: CalendarDayType;
@@ -15,7 +15,7 @@ export const CalendarDay = memo(function CalendarDay({ day, currentMonth, onClic
   const { t } = useTranslation();
   const isCurrentMonth = isSameMonth(day.date, currentMonth);
   const dayNumber = format(day.date, 'd');
-  const fullDate = format(day.date, 'EEEE, MMMM d, yyyy', { locale: getDateLocale() });
+  const fullDate = formatLocalized(day.date, 'EEEE, MMMM d, yyyy');
 
   // Build accessible label
   const parts = [fullDate];

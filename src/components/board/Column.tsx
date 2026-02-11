@@ -60,7 +60,7 @@ export const Column = memo(function Column({
   };
 
   return (
-    <div className={`flex flex-col w-[85vw] sm:w-80 flex-shrink-0 bg-[var(--color-bg-tertiary)] rounded-lg p-4 h-full transition-all duration-200 ${
+    <div className={`flex flex-col w-[72vw] sm:w-80 flex-shrink-0 bg-[var(--color-bg-tertiary)] rounded-lg p-4 h-full transition-all duration-200 ${
       isOver ? 'ring-2 ring-[var(--color-accent-ring)] bg-[var(--color-accent-light)]' : ''
     }`}>
       {/* Column Header */}
@@ -120,7 +120,7 @@ export const Column = memo(function Column({
       </div>
 
       {/* Cards Container */}
-      <div ref={setNodeRef} className="flex-1 space-y-3 overflow-y-auto min-h-[200px]">
+      <div ref={setNodeRef} className="flex-1 space-y-3 overflow-y-auto min-h-[120px]">
         <SortableContext items={cards.map((card) => card.id)} strategy={verticalListSortingStrategy}>
           {cards.map((card) => (
             <Card

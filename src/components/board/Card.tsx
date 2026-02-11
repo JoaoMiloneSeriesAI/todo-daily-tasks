@@ -55,6 +55,7 @@ export const Card = memo(function Card({ card, onEdit, onDelete, onDuplicate, on
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    touchAction: 'none' as const, // Prevents browser from hijacking touch for scroll — required for dnd-kit on mobile
   };
 
   const completedItems = card.checklist.filter((item) => item.isCompleted).length;

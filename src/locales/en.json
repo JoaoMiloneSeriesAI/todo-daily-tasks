@@ -163,12 +163,19 @@
     "description": "Select which days of the week are work days. These will be highlighted in the calendar.",
     "hint": "Work days are used to distinguish between regular work days and weekends/holidays in the calendar view.",
     "sunday": "Sunday",
+    "sundayShort": "Sun",
     "monday": "Monday",
+    "mondayShort": "Mon",
     "tuesday": "Tuesday",
+    "tuesdayShort": "Tue",
     "wednesday": "Wednesday",
+    "wednesdayShort": "Wed",
     "thursday": "Thursday",
+    "thursdayShort": "Thu",
     "friday": "Friday",
-    "saturday": "Saturday"
+    "fridayShort": "Fri",
+    "saturday": "Saturday",
+    "saturdayShort": "Sat"
   },
   "settingsTemplates": {
     "title": "Templates",
