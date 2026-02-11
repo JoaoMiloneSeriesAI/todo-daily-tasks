@@ -102,8 +102,8 @@ export function Settings() {
                 </h1>
               </div>
 
-              {/* Settings content -- full width */}
-              <div className="bg-[var(--color-surface)] rounded-xl shadow-sm border border-[var(--color-border)] p-4">
+              {/* Settings content -- full width, no horizontal overflow */}
+              <div className="bg-[var(--color-surface)] rounded-xl shadow-sm border border-[var(--color-border)] p-4 overflow-x-hidden">
                 {renderContent(activeTab)}
               </div>
             </motion.div>

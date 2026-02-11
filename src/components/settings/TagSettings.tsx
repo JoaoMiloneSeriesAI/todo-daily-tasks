@@ -40,13 +40,11 @@ export function TagSettings() {
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">{t('settingsTags.description')}</p>
       </div>
 
-      <div className="flex gap-3 items-end p-4 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border)]">
-        <div className="flex-1">
-          <Input label={t('settingsTags.tagName')} value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t('settingsTags.tagNamePlaceholder')} onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
-        </div>
+      <div className="p-4 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border)] space-y-3">
+        <Input label={t('settingsTags.tagName')} value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t('settingsTags.tagNamePlaceholder')} onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
         <div>
           <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">{t('settingsTags.color')}</label>
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {TAG_COLORS.map((c) => (
               <button key={c} onClick={() => setNewColor(c)} className={`w-8 h-8 rounded-lg transition-all ${newColor === c ? 'ring-2 ring-offset-1 ring-[var(--color-accent)] scale-110' : 'hover:scale-105'}`} style={{ backgroundColor: c }} />
             ))}
@@ -62,17 +60,19 @@ export function TagSettings() {
           tags.map((tag) => (
             <div key={tag.id} className="flex items-center justify-between p-3 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] transition-colors">
               {editingId === tag.id ? (
-                <div className="flex items-center gap-2 flex-1">
+                <div className="flex flex-wrap items-center gap-2 flex-1">
                   <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)}
-                    className="px-2 py-1 text-sm bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded text-[var(--color-text-primary)] flex-1"
+                    className="px-2 py-1 text-sm bg-[var(--color-input-bg)] border border-[var(--color-input-border)] rounded text-[var(--color-text-primary)] flex-1 min-w-[120px]"
                     autoFocus onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null); }} />
-                  <div className="flex gap-1">
+                  <div className="flex flex-wrap gap-1">
                     {TAG_COLORS.map((c) => (
                       <button key={c} onClick={() => setEditColor(c)} className={`w-6 h-6 rounded ${editColor === c ? 'ring-2 ring-[var(--color-accent)]' : ''}`} style={{ backgroundColor: c }} />
                     ))}
                   </div>
-                  <button onClick={saveEdit} className="p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded"><Check size={16} className="text-green-600" /></button>
-                  <button onClick={() => setEditingId(null)} className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"><X size={16} className="text-red-600" /></button>
+                  <div className="flex gap-1 ml-auto">
+                    <button onClick={saveEdit} className="p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded"><Check size={16} className="text-green-600" /></button>
+                    <button onClick={() => setEditingId(null)} className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"><X size={16} className="text-red-600" /></button>
+                  </div>
                 </div>
               ) : (
                 <>

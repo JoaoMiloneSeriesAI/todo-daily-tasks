@@ -270,17 +270,23 @@ function App() {
       {/* Main Content */}
       <main className={`flex-1 ${isMobile ? 'p-3 pb-28' : 'p-6'} max-w-7xl mx-auto w-full`}>
         <Suspense fallback={<div className="flex items-center justify-center h-64"><LoadingSpinner /></div>}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentView}
-              initial={viewTransition.initial}
-              animate={viewTransition.animate}
-              exit={viewTransition.exit}
-              transition={viewTransition.transition}
-            >
-              {renderView()}
-            </motion.div>
-          </AnimatePresence>
+          {isMobile ? (
+            // Mobile: instant switch, no animation, no stacking
+            renderView()
+          ) : (
+            // Desktop: animated transitions
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentView}
+                initial={viewTransition.initial}
+                animate={viewTransition.animate}
+                exit={viewTransition.exit}
+                transition={viewTransition.transition}
+              >
+                {renderView()}
+              </motion.div>
+            </AnimatePresence>
+          )}
         </Suspense>
       </main>
 

@@ -83,15 +83,15 @@ export function TemplateSettings() {
           </div>
         ) : (
           templates.map((template) => (
-            <div key={template.id} className="flex items-center justify-between p-4 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-semibold text-sm" style={{ backgroundColor: template.color }}>
+            <div key={template.id} className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] transition-colors">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center text-white font-semibold text-sm" style={{ backgroundColor: template.color }}>
                   {template.prefix}
                 </div>
-                <div>
-                  <h3 className="font-medium text-[var(--color-text-primary)]">{template.name}</h3>
+                <div className="min-w-0">
+                  <h3 className="font-medium text-[var(--color-text-primary)] truncate">{template.name}</h3>
                   {template.defaultTags.length > 0 && (
-                    <div className="flex gap-1 mt-1">
+                    <div className="flex flex-wrap gap-1 mt-1">
                       {template.defaultTags.map((tag) => {
                         const tagDef = globalTags.find((td) => td.name === tag);
                         return (
@@ -105,9 +105,13 @@ export function TemplateSettings() {
                   )}
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button variant="secondary" onClick={() => handleOpenModal(template)} leftIcon={<Edit2 size={14} />}>{t('common.edit')}</Button>
-                <Button variant="secondary" onClick={() => setDeleteId(template.id)} leftIcon={<Trash2 size={14} />} className="text-red-600">{t('common.delete')}</Button>
+              <div className="flex gap-2 ml-auto flex-shrink-0">
+                <button onClick={() => handleOpenModal(template)} className="p-2 rounded-lg hover:bg-[var(--color-surface-active)] transition-colors" title={t('common.edit')}>
+                  <Edit2 size={16} className="text-[var(--color-text-secondary)]" />
+                </button>
+                <button onClick={() => setDeleteId(template.id)} className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title={t('common.delete')}>
+                  <Trash2 size={16} className="text-red-500" />
+                </button>
               </div>
             </div>
           ))
