@@ -133,10 +133,14 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       console.error('Error clearing data on disk:', error);
     }
 
-    // Reset in-memory state
+    // Reset in-memory state (restore default templates, not empty)
     set({
       settings: DEFAULT_SETTINGS,
-      templates: [],
+      templates: [
+        { id: '1', name: 'Bug Fix', prefix: '🐛 ', color: '#EF4444', defaultTags: ['bug', 'urgent'] },
+        { id: '2', name: 'Feature', prefix: '✨ ', color: '#10B981', defaultTags: ['feature'] },
+        { id: '3', name: 'Documentation', prefix: '📝 ', color: '#3B82F6', defaultTags: ['docs'] },
+      ],
       isLoading: false,
     });
   },

@@ -171,3 +171,10 @@ html.mobile-app #root {
     min-width: 44px;
   }
 }
+
+/* Prevent iOS auto-zoom on input focus — iOS zooms when font-size < 16px */
+@media screen and (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
